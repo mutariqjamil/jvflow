@@ -205,9 +205,9 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
   }
 
   const SidebarContent = () => (
-    <>
-      {/* Organization Selector */}
-      <div className="p-4 border-b">
+    <div className="flex flex-col h-full">
+      {/* Organization Selector - Fixed at top */}
+      <div className="flex-shrink-0 p-4 border-b">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -288,36 +288,39 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
         </div>
       </div>
 
-      <nav className="p-4 space-y-2">
-        <div className="pb-2 mb-4 border-b">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Navigation
-          </p>
-        </div>
-        {getNavigationItems().map((item) => {
-          const Icon = item.icon
-          const isActive = activeTab === item.id
-          return (
-            <Button
-              key={item.id}
-              variant={isActive ? 'default' : 'ghost'}
-              className={`w-full justify-start transition-all ${
-                isActive 
-                  ? 'bg-primary text-primary-foreground shadow-sm' 
-                  : 'hover:bg-muted/50'
-              }`}
-              onClick={() => handleTabChange(item.id)}
-            >
-              <Icon className="mr-3 h-4 w-4" />
-              <span className="text-sm font-medium">{item.label}</span>
-            </Button>
-          )
-        })}
-      </nav>
+      {/* Scrollable Navigation Area */}
+      <div className="flex-1 overflow-y-auto">
+        <nav className="p-4 space-y-2">
+          <div className="pb-2 mb-4 border-b">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Navigation
+            </p>
+          </div>
+          {getNavigationItems().map((item) => {
+            const Icon = item.icon
+            const isActive = activeTab === item.id
+            return (
+              <Button
+                key={item.id}
+                variant={isActive ? 'default' : 'ghost'}
+                className={`w-full justify-start transition-all ${
+                  isActive 
+                    ? 'bg-primary text-primary-foreground shadow-sm' 
+                    : 'hover:bg-muted/50'
+                }`}
+                onClick={() => handleTabChange(item.id)}
+              >
+                <Icon className="mr-3 h-4 w-4" />
+                <span className="text-sm font-medium">{item.label}</span>
+              </Button>
+            )
+          })}
+        </nav>
+      </div>
       
-      {/* System Status - Demo Mode Indicator */}
+      {/* System Status - Fixed at bottom */}
       {isDemoMode && (
-        <div className="absolute bottom-4 left-4 right-4">
+        <div className="flex-shrink-0 p-4">
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
@@ -329,7 +332,7 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
           </div>
         </div>
       )}
-    </>
+    </div>
   )
 
   return (
@@ -347,7 +350,7 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-64">
               <div className="flex flex-col h-full">
-                <div className="flex items-center px-4 py-3 border-b">
+                <div className="flex items-center px-4 py-3 border-b flex-shrink-0">
                   <div className="flex items-center space-x-3">
                     <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
                       <Building2 className="h-5 w-5 text-primary-foreground" />
@@ -357,7 +360,7 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
                     </div>
                   </div>
                 </div>
-                <div className="flex-1 relative">
+                <div className="flex-1 overflow-hidden">
                   <SidebarContent />
                 </div>
               </div>
