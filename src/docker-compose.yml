@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  jv-flow-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+      - VITE_ENVIRONMENT=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - jv-flow-network
+
+  # Optional: Nginx reverse proxy for multiple instances
+  nginx-proxy:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-proxy.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - jv-flow-app
+    restart: unless-stopped
+    networks:
+      - jv-flow-network
+
+networks:
+  jv-flow-network:
+    driver: bridge
+
+# Optional: For development with local Supabase
+# Uncomment the following section if you want to run Supabase locally
+# supabase-db:
+#   image: supabase/postgres:14.1.0.89
+#   environment:
+#     POSTGRES_PASSWORD: your-super-secret-and-long-postgres-password
+#   volumes:
+#     - ./data/db:/var/lib/postgresql/data
+#   networks:
+#     - jv-flow-network
+# 
+# supabase-api:
+#   image: supabase/gotrue:v2.24.1
+#   depends_on:
+#     - supabase-db
+#   environment:
+#     GOTRUE_API_HOST: 0.0.0.0
+#     GOTRUE_API_PORT: 9999
+#     GOTRUE_DB_DRIVER: postgres
+#     GOTRUE_DB_DATABASE_URL: postgres://postgres:your-super-secret-and-long-postgres-password@supabase-db:5432/postgres
+#   networks:
+#     - jv-flow-network
