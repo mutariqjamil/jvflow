@@ -17,7 +17,14 @@ export const publicAnonKey = envSupabaseAnonKey || 'demo-anon-key'
 export const isProduction = appMode === 'production'
 export const isDevelopment = appMode === 'development'
 export const isDebugMode = debugMode
-export const hasSupabaseCredentials = !!(envSupabaseUrl && envSupabaseAnonKey)
+// Check for valid Supabase credentials (not just empty strings)
+export const hasSupabaseCredentials = !!(
+  envSupabaseUrl && 
+  envSupabaseAnonKey && 
+  envSupabaseUrl.length > 10 && 
+  envSupabaseAnonKey.length > 10 &&
+  envSupabaseUrl.includes('supabase.co')
+)
 
 // Full Supabase URL for client initialization
 export const supabaseUrl = envSupabaseUrl || 'https://demo-project.supabase.co'
