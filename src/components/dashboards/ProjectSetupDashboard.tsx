@@ -133,7 +133,7 @@ export function ProjectSetupDashboard() {
     city: '',
     state: '',
     postal_code: '',
-    country: 'India',
+    country: 'Pakistan',
     total_area: 0,
     covered_area: 0,
     open_area: 0,
@@ -482,6 +482,7 @@ export function ProjectSetupDashboard() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="Pakistan">Pakistan</SelectItem>
                     <SelectItem value="India">India</SelectItem>
                     <SelectItem value="USA">USA</SelectItem>
                     <SelectItem value="UAE">UAE</SelectItem>

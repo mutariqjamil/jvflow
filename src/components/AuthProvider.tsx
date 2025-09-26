@@ -119,29 +119,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Create a user profile from Supabase user data with metadata
+      // Check if this is the super admin email
+      const isSuperAdmin = user.email === 'tj.analyst@gmail.com'
+      
       const userProfile: UserProfile = {
         id: user.id,
         email: user.email!,
-        role: 'admin', // Default role
-        name: user.user_metadata?.name || user.email!.split('@')[0],
+        role: isSuperAdmin ? 'super_admin' : 'admin', // Set super admin role for tj.analyst@gmail.com
+        name: user.user_metadata?.name || (isSuperAdmin ? 'Muhammad Tariq (Super Admin)' : user.email!.split('@')[0]),
         registration_type: user.user_metadata?.registration_type || 'email',
-        subscription_status: user.user_metadata?.subscription_status || 'trial',
+        subscription_status: user.user_metadata?.subscription_status || (isSuperAdmin ? 'active' : 'trial'),
         trial_start_date: user.user_metadata?.trial_start_date || new Date().toISOString(),
-        trial_end_date: user.user_metadata?.trial_end_date || new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
+        trial_end_date: user.user_metadata?.trial_end_date || new Date(Date.now() + (isSuperAdmin ? 365 : 31) * 24 * 60 * 60 * 1000).toISOString(),
         phone: user.user_metadata?.phone
       }
 
-      // Create default organization for the user
-      const defaultOrg: Organization = {
-        id: `org-${user.id}`,
-        name: `${userProfile.name}'s Organization`,
-        description: 'Personal organization for project management',
-        industry: 'Real Estate',
-        owner_id: user.id,
-        subscription_status: userProfile.subscription_status as 'trial' | 'active' | 'expired',
-        trial_end_date: userProfile.trial_end_date,
-        user_role: 'admin',
-        user_permissions: ['*']
+      // Create organization(s) based on user role
+      let organizations: Organization[]
+      let currentOrg: Organization
+      
+      if (isSuperAdmin) {
+        // Super admin gets both platform admin and demo org access
+        const platformAdminOrg: Organization = {
+          id: 'platform-admin',
+          name: 'JV-Flow Platform Administration',
+          description: 'Super admin organization for platform management',
+          industry: 'Platform Management',
+          owner_id: user.id,
+          subscription_status: 'active',
+          trial_end_date: userProfile.trial_end_date,
+          user_role: 'super_admin',
+          user_permissions: ['*', 'platform.*', 'super_admin.*']
+        }
+        
+        const demoOrg: Organization = {
+          id: 'default-org',
+          name: 'Demo Real Estate Company',
+          description: 'Demo organization for testing JV-Flow features',
+          industry: 'Real Estate',
+          owner_id: user.id,
+          subscription_status: 'active',
+          trial_end_date: userProfile.trial_end_date,
+          user_role: 'admin',
+          user_permissions: ['*']
+        }
+        
+        organizations = [platformAdminOrg, demoOrg]
+        currentOrg = platformAdminOrg // Start with platform admin
+      } else {
+        // Regular users get a single organization
+        const defaultOrg: Organization = {
+          id: `org-${user.id}`,
+          name: `${userProfile.name.replace(' (Super Admin)', '')}'s Organization`,
+          description: 'Personal organization for project management',
+          industry: 'Real Estate',
+          owner_id: user.id,
+          subscription_status: userProfile.subscription_status as 'trial' | 'active' | 'expired',
+          trial_end_date: userProfile.trial_end_date,
+          user_role: 'admin',
+          user_permissions: ['*']
+        }
+        
+        organizations = [defaultOrg]
+        currentOrg = defaultOrg
       }
 
       // Calculate trial days remaining
@@ -149,8 +189,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const daysRemaining = Math.max(0, Math.ceil((trialEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
       
       setUser(userProfile)
-      setOrganizations([defaultOrg])
-      setCurrentOrganization(defaultOrg)
+      setOrganizations(organizations)
+      setCurrentOrganization(currentOrg)
       setTrialDaysRemaining(daysRemaining)
       
       authLog('info', 'Profile refresh completed successfully', { userId: user.id, email: user.email, daysRemaining })
