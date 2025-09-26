@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { useIsMobile } from './ui/use-mobile'
+import { useBreakpoint } from './ui/use-breakpoint'
 import { DashboardLayout } from './DashboardLayout'
 import { MobileDashboard } from './mobile/MobileDashboard'
 import { useInternationalization } from './providers/InternationalizationProvider'
@@ -11,10 +11,11 @@ interface ResponsiveWrapperProps {
 }
 
 export function ResponsiveWrapper({ activeTab, onTabChange, children }: ResponsiveWrapperProps) {
-  const isMobile = useIsMobile()
+  const breakpoint = useBreakpoint()
   const { direction } = useInternationalization()
 
-  if (isMobile) {
+  // Mobile layout - use dedicated mobile dashboard
+  if (breakpoint === 'mobile') {
     return (
       <div dir={direction}>
         <MobileDashboard activeTab={activeTab} onTabChange={onTabChange}>
@@ -26,10 +27,18 @@ export function ResponsiveWrapper({ activeTab, onTabChange, children }: Responsi
     )
   }
 
+  // Tablet and Desktop layout - use main dashboard layout
+  // Tablet gets some responsive styling via CSS classes
+  const containerClasses = breakpoint === 'tablet' 
+    ? 'tablet-layout' // Add tablet-specific styling class
+    : 'desktop-layout' // Add desktop-specific styling class
+
   return (
-    <div dir={direction}>
+    <div dir={direction} className={containerClasses}>
       <DashboardLayout activeTab={activeTab} onTabChange={onTabChange}>
-        {children}
+        <div className={breakpoint === 'tablet' ? 'tablet-content' : 'desktop-content'}>
+          {children}
+        </div>
       </DashboardLayout>
     </div>
   )

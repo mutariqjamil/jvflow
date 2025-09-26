@@ -1,0 +1,122 @@
+/* Responsive layout styles for JV-Flow */
+
+/* Tablet Layout Optimizations */
+.tablet-layout {
+  --sidebar-width: 240px; /* Slightly narrower sidebar on tablet */
+}
+
+.tablet-layout .mobile-content,
+.tablet-layout .tablet-content {
+  /* Tablet-specific content adjustments */
+  padding: 1rem;
+  max-width: none; /* Allow full width usage on tablet */
+}
+
+.tablet-layout .dashboard-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.tablet-layout .card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.875rem;
+}
+
+/* Desktop Layout Optimizations */
+.desktop-layout {
+  --sidebar-width: 280px; /* Full width sidebar on desktop */
+}
+
+.desktop-layout .desktop-content {
+  padding: 1.5rem;
+}
+
+.desktop-layout .dashboard-grid {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.desktop-layout .card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Shared responsive utilities */
+.responsive-text {
+  /* Mobile: base size, Tablet: slightly larger, Desktop: full size */
+  font-size: clamp(0.875rem, 2vw, 1rem);
+}
+
+.responsive-spacing {
+  /* Adaptive spacing based on viewport */
+  padding: clamp(1rem, 3vw, 2rem);
+  margin: clamp(0.5rem, 2vw, 1rem);
+}
+
+.responsive-card {
+  /* Adaptive card sizing */
+  min-height: clamp(200px, 25vh, 300px);
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+/* Tablet-specific overrides */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .tablet-layout .sidebar {
+    width: var(--sidebar-width);
+  }
+  
+  .tablet-layout .main-content {
+    margin-left: var(--sidebar-width);
+  }
+  
+  /* Adjust form layouts for tablet */
+  .tablet-layout .form-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .tablet-layout .button-group {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+/* Desktop-specific overrides */
+@media (min-width: 1024px) {
+  .desktop-layout .sidebar {
+    width: var(--sidebar-width);
+  }
+  
+  .desktop-layout .main-content {
+    margin-left: var(--sidebar-width);
+  }
+  
+  /* Enhanced form layouts for desktop */
+  .desktop-layout .form-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .desktop-layout .button-group {
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+}
+
+/* Print-friendly styles */
+@media print {
+  .tablet-layout,
+  .desktop-layout {
+    --sidebar-width: 0;
+  }
+  
+  .sidebar {
+    display: none !important;
+  }
+  
+  .main-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+}

@@ -9,11 +9,96 @@ import { Alert, AlertDescription } from './ui/alert'
 import { Badge } from './ui/badge'
 import { useAuth } from './AuthProvider'
 import { useInternationalization } from './providers/InternationalizationProvider'
+import { useBreakpoint } from './ui/use-breakpoint'
 
-export function LoginForm() {
+function MobileBrandingHeader() {
+  return (
+    <div className="text-center mb-8">
+      <div className="flex items-center justify-center space-x-2 mb-2">
+        <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+          <Building2 className="w-5 h-5 text-white" />
+        </div>
+        <h1 className="text-2xl font-bold text-gray-900">JV-Flow</h1>
+      </div>
+      <p className="text-sm text-gray-600 mb-3">Real Estate Joint Venture Management</p>
+      <div className="flex items-center justify-center space-x-2">
+        <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
+          31-Day Free Trial
+        </Badge>
+        <Badge variant="outline" className="text-xs">
+          No Credit Card
+        </Badge>
+      </div>
+    </div>
+  )
+}
+
+function DesktopBrandingSection() {
+  return (
+    <div className="space-y-8">
+      <div className="space-y-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+            <Building2 className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">JV-Flow</h1>
+            <p className="text-gray-600">Real Estate Joint Venture Management</p>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <p className="text-lg text-gray-700">
+            Streamline your real estate development projects with comprehensive tracking, 
+            transparent reporting, and efficient collaboration tools.
+          </p>
+          <div className="flex items-center space-x-2">
+            <Badge variant="secondary" className="bg-green-100 text-green-800">
+              31-Day Free Trial
+            </Badge>
+            <Badge variant="outline">
+              No Credit Card Required
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-4">
+        <div className="flex items-start space-x-3">
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+            <TrendingUp className="w-4 h-4 text-blue-600" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">Financial Transparency</h3>
+            <p className="text-gray-600">Real-time expense tracking with maker-checker approval workflows</p>
+          </div>
+        </div>
+
+        <div className="flex items-start space-x-3">
+          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+            <Users className="w-4 h-4 text-green-600" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">Multi-stakeholder Management</h3>
+            <p className="text-gray-600">Role-based dashboards for investors, builders, and marketing agencies</p>
+          </div>
+        </div>
+
+        <div className="flex items-start space-x-3">
+          <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+            <Shield className="w-4 h-4 text-purple-600" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">Complete Audit Trail</h3>
+            <p className="text-gray-600">Enterprise-grade security with comprehensive transaction logging</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AuthForm({ activeTab, onTabChange }: { activeTab: string; onTabChange: (tab: string) => void }) {
   const { signIn, signInWithProvider, signUp, isDemoMode } = useAuth()
-  const { t, direction } = useInternationalization()
-  const [activeTab, setActiveTab] = useState('signin')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -92,7 +177,7 @@ export function LoginForm() {
         registrationType: signUpData.registrationType
       })
       setSuccess('Account created successfully! You can now sign in with your credentials.')
-      setActiveTab('signin')
+      onTabChange('signin')
       setSignInEmail(signUpData.registrationType === 'email' ? signUpData.email : '')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign up failed')
@@ -120,332 +205,325 @@ export function LoginForm() {
   }
 
   return (
+    <Card className="border-0 shadow-xl">
+      <CardHeader className="space-y-2 text-center">
+        <CardTitle className="text-xl md:text-2xl">
+          {activeTab === 'signin' ? 'Welcome Back' : 'Join JV-Flow'}
+        </CardTitle>
+        <CardDescription className="text-sm">
+          {activeTab === 'signin' 
+            ? 'Sign in to your account to continue' 
+            : 'Start your 31-day free trial today'
+          }
+        </CardDescription>
+        {isDemoMode && (
+          <Alert className="text-left">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="text-sm">
+              <strong>Demo Mode:</strong> Use any credentials to sign in or create account
+            </AlertDescription>
+          </Alert>
+        )}
+      </CardHeader>
+      <CardContent>
+        <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="signin" className="text-sm">Sign In</TabsTrigger>
+            <TabsTrigger value="signup" className="text-sm">Sign Up</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="signin" className="space-y-4">
+            {/* Social Sign In Buttons */}
+            {!isDemoMode && (
+              <div className="space-y-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-12"
+                  onClick={() => handleSocialSignIn('google')}
+                  disabled={loading}
+                >
+                  <Chrome className="w-4 h-4 mr-2" />
+                  <span className="text-sm">Continue with Google</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-12"
+                  onClick={() => handleSocialSignIn('facebook')}
+                  disabled={loading}
+                >
+                  <Facebook className="w-4 h-4 mr-2" />
+                  <span className="text-sm">Continue with Facebook</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-12"
+                  onClick={() => handleSocialSignIn('linkedin')}
+                  disabled={loading}
+                >
+                  <Linkedin className="w-4 h-4 mr-2" />
+                  <span className="text-sm">Continue with LinkedIn</span>
+                </Button>
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Or continue with email
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSignIn} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="signin-email" className="text-sm font-medium">Email</Label>
+                <Input
+                  id="signin-email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={signInEmail}
+                  onChange={(e) => setSignInEmail(e.target.value)}
+                  className="h-12 text-base"
+                  style={{ fontSize: '16px' }}
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="signin-password" className="text-sm font-medium">Password</Label>
+                <Input
+                  id="signin-password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={signInPassword}
+                  onChange={(e) => setSignInPassword(e.target.value)}
+                  className="h-12 text-base"
+                  style={{ fontSize: '16px' }}
+                  required
+                />
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full h-12" 
+                disabled={loading}
+              >
+                {loading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </form>
+
+            {/* Demo Login Button */}
+            {isDemoMode && (
+              <div className="pt-4 border-t">
+                <Button 
+                  type="button"
+                  variant="outline"
+                  className="w-full h-12"
+                  onClick={handleDemoLogin}
+                >
+                  Use Demo Credentials
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="signup" className="space-y-4">
+            <form onSubmit={handleSignUp} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="signup-name" className="text-sm font-medium">Full Name</Label>
+                <Input
+                  id="signup-name"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={signUpData.name}
+                  onChange={(e) => setSignUpData(prev => ({ ...prev, name: e.target.value }))}
+                  className="h-12 text-base"
+                  style={{ fontSize: '16px' }}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Registration Method</Label>
+                <div className="flex space-x-2">
+                  <Button
+                    type="button"
+                    variant={signUpData.registrationType === 'email' ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-10"
+                    onClick={() => setSignUpData(prev => ({ ...prev, registrationType: 'email' }))}
+                  >
+                    <Mail className="w-4 h-4 mr-1" />
+                    <span className="text-sm">Email</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={signUpData.registrationType === 'phone' ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-10"
+                    onClick={() => setSignUpData(prev => ({ ...prev, registrationType: 'phone' }))}
+                  >
+                    <Phone className="w-4 h-4 mr-1" />
+                    <span className="text-sm">Phone</span>
+                  </Button>
+                </div>
+              </div>
+
+              {signUpData.registrationType === 'email' ? (
+                <div className="space-y-2">
+                  <Label htmlFor="signup-email" className="text-sm font-medium">Email Address</Label>
+                  <Input
+                    id="signup-email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={signUpData.email}
+                    onChange={(e) => setSignUpData(prev => ({ ...prev, email: e.target.value }))}
+                    className="h-12 text-base"
+                    style={{ fontSize: '16px' }}
+                    required
+                  />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="signup-phone" className="text-sm font-medium">Phone Number</Label>
+                  <Input
+                    id="signup-phone"
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    value={signUpData.phone}
+                    onChange={(e) => setSignUpData(prev => ({ ...prev, phone: e.target.value }))}
+                    className="h-12 text-base"
+                    style={{ fontSize: '16px' }}
+                    required
+                  />
+                </div>
+              )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="signup-password" className="text-sm font-medium">Password</Label>
+                <Input
+                  id="signup-password"
+                  type="password"
+                  placeholder="Create a password (min 6 characters)"
+                  value={signUpData.password}
+                  onChange={(e) => setSignUpData(prev => ({ ...prev, password: e.target.value }))}
+                  className="h-12 text-base"
+                  style={{ fontSize: '16px' }}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="signup-confirm-password" className="text-sm font-medium">Confirm Password</Label>
+                <Input
+                  id="signup-confirm-password"
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={signUpData.confirmPassword}
+                  onChange={(e) => setSignUpData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  className="h-12 text-base"
+                  style={{ fontSize: '16px' }}
+                  required
+                />
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full h-12" 
+                disabled={loading}
+              >
+                {loading ? 'Creating Account...' : 'Start Free Trial'}
+              </Button>
+            </form>
+          </TabsContent>
+        </Tabs>
+
+        {error && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="text-sm">{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {success && (
+          <Alert className="mt-4 border-green-200 bg-green-50">
+            <AlertCircle className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800 text-sm">{success}</AlertDescription>
+          </Alert>
+        )}
+
+        {activeTab === 'signup' && (
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
+            <p className="font-medium text-sm">🎉 Free Trial Benefits:</p>
+            <ul className="mt-1 space-y-1 text-xs">
+              <li>• 31 days completely free</li>
+              <li>• Full access to all features</li>
+              <li>• No credit card required</li>
+              <li>• Cancel anytime</li>
+            </ul>
+          </div>
+        )}
+
+        {!isDemoMode && activeTab === 'signin' && (
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Forgot your password?{' '}
+              <a href="#" className="text-blue-600 hover:underline">
+                Reset it here
+              </a>
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+export function LoginForm() {
+  const { direction } = useInternationalization()
+  const [activeTab, setActiveTab] = useState('signin')
+  const breakpoint = useBreakpoint()
+
+  if (breakpoint === 'mobile') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4" dir={direction}>
+        <MobileBrandingHeader />
+        <div className="w-full max-w-sm mx-auto">
+          <AuthForm activeTab={activeTab} onTabChange={setActiveTab} />
+        </div>
+      </div>
+    )
+  }
+
+  if (breakpoint === 'tablet') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6" dir={direction}>
+        <MobileBrandingHeader />
+        <div className="w-full max-w-md mx-auto">
+          <AuthForm activeTab={activeTab} onTabChange={setActiveTab} />
+        </div>
+      </div>
+    )
+  }
+
+  // Desktop layout
+  return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4" dir={direction}>
       <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
         {/* Left side - Branding and features */}
-        <div className="hidden lg:block space-y-8">
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">JV-Flow</h1>
-                <p className="text-gray-600">Real Estate Joint Venture Management</p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <p className="text-lg text-gray-700">
-                Streamline your real estate development projects with comprehensive tracking, 
-                transparent reporting, and efficient collaboration tools.
-              </p>
-              <div className="flex items-center space-x-2">
-                <Badge variant="secondary" className="bg-green-100 text-green-800">
-                  31-Day Free Trial
-                </Badge>
-                <Badge variant="outline">
-                  No Credit Card Required
-                </Badge>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid gap-4">
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                <TrendingUp className="w-4 h-4 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Financial Transparency</h3>
-                <p className="text-gray-600">Real-time expense tracking with maker-checker approval workflows</p>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                <Users className="w-4 h-4 text-green-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Multi-stakeholder Management</h3>
-                <p className="text-gray-600">Role-based dashboards for investors, builders, and marketing agencies</p>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                <Shield className="w-4 h-4 text-purple-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Complete Audit Trail</h3>
-                <p className="text-gray-600">Enterprise-grade security with comprehensive transaction logging</p>
-              </div>
-            </div>
-          </div>
+        <div className="hidden lg:block">
+          <DesktopBrandingSection />
         </div>
 
         {/* Right side - Auth forms */}
         <div className="w-full max-w-md mx-auto">
-          <Card className="border-0 shadow-xl">
-            <CardHeader className="space-y-2 text-center">
-              <CardTitle className="text-2xl">
-                {activeTab === 'signin' ? 'Welcome Back' : 'Join JV-Flow'}
-              </CardTitle>
-              <CardDescription>
-                {activeTab === 'signin' 
-                  ? 'Sign in to your account to continue' 
-                  : 'Start your 31-day free trial today'
-                }
-              </CardDescription>
-              {isDemoMode && (
-                <Alert className="text-left">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    <strong>Demo Mode:</strong> Use any credentials to sign in or create account
-                  </AlertDescription>
-                </Alert>
-              )}
-            </CardHeader>
-            <CardContent>
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="signin">Sign In</TabsTrigger>
-                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="signin" className="space-y-4">
-                  {/* Social Sign In Buttons */}
-                  {!isDemoMode && (
-                    <div className="space-y-3">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => handleSocialSignIn('google')}
-                        disabled={loading}
-                      >
-                        <Chrome className="w-4 h-4 mr-2" />
-                        Continue with Google
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => handleSocialSignIn('facebook')}
-                        disabled={loading}
-                      >
-                        <Facebook className="w-4 h-4 mr-2" />
-                        Continue with Facebook
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => handleSocialSignIn('linkedin')}
-                        disabled={loading}
-                      >
-                        <Linkedin className="w-4 h-4 mr-2" />
-                        Continue with LinkedIn
-                      </Button>
-                      
-                      <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                          <span className="w-full border-t" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                          <span className="bg-background px-2 text-muted-foreground">
-                            Or continue with email
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <form onSubmit={handleSignIn} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signin-email">Email</Label>
-                      <Input
-                        id="signin-email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={signInEmail}
-                        onChange={(e) => setSignInEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="signin-password">Password</Label>
-                      <Input
-                        id="signin-password"
-                        type="password"
-                        placeholder="Enter your password"
-                        value={signInPassword}
-                        onChange={(e) => setSignInPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full" 
-                      disabled={loading}
-                    >
-                      {loading ? 'Signing in...' : 'Sign In'}
-                    </Button>
-                  </form>
-
-                  {/* Demo Login Button */}
-                  {isDemoMode && (
-                    <div className="pt-4 border-t">
-                      <Button 
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        onClick={handleDemoLogin}
-                      >
-                        Use Demo Credentials
-                      </Button>
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="signup" className="space-y-4">
-                  <form onSubmit={handleSignUp} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-name">Full Name</Label>
-                      <Input
-                        id="signup-name"
-                        type="text"
-                        placeholder="Enter your full name"
-                        value={signUpData.name}
-                        onChange={(e) => setSignUpData(prev => ({ ...prev, name: e.target.value }))}
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Registration Method</Label>
-                      <div className="flex space-x-2">
-                        <Button
-                          type="button"
-                          variant={signUpData.registrationType === 'email' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setSignUpData(prev => ({ ...prev, registrationType: 'email' }))}
-                        >
-                          <Mail className="w-4 h-4 mr-1" />
-                          Email
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={signUpData.registrationType === 'phone' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setSignUpData(prev => ({ ...prev, registrationType: 'phone' }))}
-                        >
-                          <Phone className="w-4 h-4 mr-1" />
-                          Phone
-                        </Button>
-                      </div>
-                    </div>
-
-                    {signUpData.registrationType === 'email' ? (
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-email">Email Address</Label>
-                        <Input
-                          id="signup-email"
-                          type="email"
-                          placeholder="Enter your email"
-                          value={signUpData.email}
-                          onChange={(e) => setSignUpData(prev => ({ ...prev, email: e.target.value }))}
-                          required
-                        />
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-phone">Phone Number</Label>
-                        <Input
-                          id="signup-phone"
-                          type="tel"
-                          placeholder="Enter your phone number"
-                          value={signUpData.phone}
-                          onChange={(e) => setSignUpData(prev => ({ ...prev, phone: e.target.value }))}
-                          required
-                        />
-                      </div>
-                    )}
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password">Password</Label>
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="Create a password (min 6 characters)"
-                        value={signUpData.password}
-                        onChange={(e) => setSignUpData(prev => ({ ...prev, password: e.target.value }))}
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-confirm-password">Confirm Password</Label>
-                      <Input
-                        id="signup-confirm-password"
-                        type="password"
-                        placeholder="Confirm your password"
-                        value={signUpData.confirmPassword}
-                        onChange={(e) => setSignUpData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        required
-                      />
-                    </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full" 
-                      disabled={loading}
-                    >
-                      {loading ? 'Creating Account...' : 'Start Free Trial'}
-                    </Button>
-                  </form>
-                </TabsContent>
-              </Tabs>
-
-              {error && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              {success && (
-                <Alert className="mt-4 border-green-200 bg-green-50">
-                  <AlertCircle className="h-4 w-4 text-green-600" />
-                  <AlertDescription className="text-green-800">{success}</AlertDescription>
-                </Alert>
-              )}
-
-              {activeTab === 'signup' && (
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
-                  <p className="font-medium">🎉 Free Trial Benefits:</p>
-                  <ul className="mt-1 space-y-1 text-xs">
-                    <li>• 31 days completely free</li>
-                    <li>• Full access to all features</li>
-                    <li>• No credit card required</li>
-                    <li>• Cancel anytime</li>
-                  </ul>
-                </div>
-              )}
-
-              {!isDemoMode && activeTab === 'signin' && (
-                <div className="mt-6 text-center">
-                  <p className="text-sm text-gray-600">
-                    Forgot your password?{' '}
-                    <a href="#" className="text-blue-600 hover:underline">
-                      Reset it here
-                    </a>
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <AuthForm activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
       </div>
     </div>
