@@ -102,11 +102,22 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
     const userRole = currentOrganization?.user_role || user?.role
     const userPermissions = currentOrganization?.user_permissions || []
     const hasFullAccess = userPermissions.includes('*')
+    
+    // Debug logging in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 Navigation Debug:', {
+        userRole,
+        globalUserRole: user?.role,
+        orgRole: currentOrganization?.user_role,
+        orgName: currentOrganization?.name,
+        showSuperAdmin: user?.role === 'super_admin'
+      })
+    }
 
     // Define navigation modules with grouping
     const modules = {
       core: {
-        title: 'Core',
+        title: '', // Remove 'Core' header
         items: [
           { id: 'overview', label: t('nav.overview'), icon: TrendingUp },
         ]
@@ -137,7 +148,7 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
         ]
       },
       operations: {
-        title: 'Operations',
+        title: 'Procurement Operations',
         items: [
           { id: 'vendors', label: t('nav.vendorManagement'), icon: Truck },
           { id: 'materials', label: t('nav.materialManagement'), icon: Package },
@@ -154,11 +165,12 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
         ]
       },
       system: {
-        title: 'System',
+        title: 'MIS and Settings',
         items: [
           { id: 'audit-trail', label: 'Audit Trail', icon: Activity },
           { id: 'reports', label: t('nav.reports'), icon: BarChart3 },
           { id: 'settings', label: t('nav.settings'), icon: Settings },
+          // Super Admin always based on global user role, not organization role
           ...(user?.role === 'super_admin' ? [{ id: 'super-admin', label: 'Super Admin', icon: Crown }] : []),
         ]
       }
@@ -168,6 +180,7 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
     switch (userRole) {
       case 'owner':
       case 'admin':
+      case 'super_admin': // Super admin gets full access
         return modules
       case 'billing_manager':
         return {
@@ -274,19 +287,19 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
       {/* Organization Selector - Fixed at top */}
       <div className="flex-shrink-0 p-4 border-b">
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Organization
-            </p>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-6 w-6 p-0"
-              onClick={() => setShowCreateOrg(true)}
-            >
-              <Plus className="h-3 w-3" />
-            </Button>
-          </div>
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Organization
+              </p>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-6 w-6 p-0"
+                onClick={() => setShowCreateOrg(true)}
+              >
+                <Plus className="h-3 w-3" />
+              </Button>
+            </div>
           
           {currentOrganization && (
             <div className="space-y-2">
@@ -356,19 +369,16 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
       {/* Scrollable Navigation Area */}
       <div className="flex-1 overflow-y-auto">
         <nav className="p-4 space-y-2">
-          <div className="pb-2 mb-4 border-b">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Navigation
-            </p>
-          </div>
           <div className="space-y-4 overflow-y-auto h-full pr-2 scrollbar-thin">
             {Object.entries(getNavigationItems()).map(([moduleKey, module]) => (
               <div key={moduleKey} className="space-y-2">
-                <div className="px-2 py-1">
-                  <p className="text-xs font-medium text-muted-foreground/80 uppercase tracking-wide">
-                    {module.title}
-                  </p>
-                </div>
+                {module.title && (
+                  <div className="px-2 py-1">
+                    <p className="text-xs font-medium text-muted-foreground/80 uppercase tracking-wide">
+                      {module.title}
+                    </p>
+                  </div>
+                )}
                 <div className="space-y-1">
                   {module.items.map((item) => {
                     const Icon = item.icon
@@ -397,20 +407,6 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
         </nav>
       </div>
       
-      {/* System Status - Fixed at bottom */}
-      {isDemoMode && (
-        <div className="flex-shrink-0 p-4">
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-              <p className="text-xs font-medium text-orange-700">Demo Mode</p>
-            </div>
-            <p className="text-xs text-orange-600 mt-1">
-              Connect Supabase for full functionality
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   )
 
@@ -456,11 +452,16 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
                 Real Estate Management
               </Badge>
             </div>
-            {isDemoMode && (
-              <Badge variant="outline" className="hidden sm:inline-flex ml-2 text-xs border-orange-200 text-orange-700">
-                Demo Mode
-              </Badge>
-            )}
+            <Badge 
+              variant="outline" 
+              className={`hidden sm:inline-flex ml-2 text-xs ${
+                isDemoMode 
+                  ? 'border-orange-200 text-orange-700 bg-orange-50' 
+                  : 'border-green-200 text-green-700 bg-green-50'
+              }`}
+            >
+              {isDemoMode ? 'Demo Mode' : 'Live Mode'}
+            </Badge>
           </div>
           
           <div className="ml-auto flex items-center space-x-2 md:space-x-4">
@@ -548,20 +549,6 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
           sidebarCollapsed ? "w-16" : "w-64"
         )}>
           <div className="relative h-full flex flex-col">
-            {/* Collapse Toggle Button */}
-            <div className="p-2 border-b flex justify-end flex-shrink-0">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0"
-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              >
-                {sidebarCollapsed ? 
-                  <ChevronRight className="h-4 w-4" /> : 
-                  <ChevronLeft className="h-4 w-4" />
-                }
-              </Button>
-            </div>
             
             {/* Sidebar Content */}
             <div className="flex-1 overflow-hidden">
@@ -571,8 +558,25 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-4 md:p-6 h-[calc(100vh-4rem)] overflow-auto bg-background">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 p-4 md:p-6 h-[calc(100vh-4rem)] overflow-auto bg-background relative">
+          {/* Sidebar Toggle Button - Fixed position, always visible */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="fixed top-20 left-4 h-10 w-10 p-0 z-50 rounded-lg bg-white border-2 shadow-lg hover:shadow-xl transition-all duration-200 md:flex hidden hover:scale-105"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          >
+            <div className="flex flex-col items-center justify-center space-y-0.5">
+              <div className={`w-4 h-0.5 bg-gray-600 transform transition-transform duration-200 ${
+                sidebarCollapsed ? 'rotate-45 translate-y-0.5' : ''
+              }`} />
+              <div className={`w-4 h-0.5 bg-gray-600 transform transition-transform duration-200 ${
+                sidebarCollapsed ? '-rotate-45 -translate-y-0.5' : ''
+              }`} />
+            </div>
+          </Button>
+          
+          <div className="max-w-7xl mx-auto pt-12 md:pt-0">
             {children}
           </div>
         </main>

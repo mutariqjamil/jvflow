@@ -200,22 +200,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Check if the stored auth is not too old (24 hours)
           if (Date.now() - timestamp < 24 * 60 * 60 * 1000) {
             authLog('info', 'Restoring demo auth state from localStorage')
-            const demoOrg: Organization = {
-              id: 'demo-org',
-              name: 'Demo Organization',
-              description: 'Demo organization for testing',
+            
+            // Use CONSISTENT demo organizations
+            const platformAdminOrg: Organization = {
+              id: 'platform-admin',
+              name: 'JV-Flow Platform Administration',
+              description: 'Super admin organization for platform management',
+              industry: 'Platform Management',
+              owner_id: 'super-admin-001',
+              subscription_status: 'active',
+              trial_end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+              user_role: 'super_admin',
+              user_permissions: ['*', 'platform.*', 'super_admin.*']
+            }
+            
+            const defaultOrg: Organization = {
+              id: 'default-org',
+              name: 'Demo Real Estate Company',
+              description: 'Demo organization for testing JV-Flow features',
               industry: 'Real Estate',
-              owner_id: 'demo-user-001',
-              subscription_status: 'trial',
+              owner_id: 'super-admin-001',
+              subscription_status: 'active',
               trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
               user_role: 'admin',
               user_permissions: ['*']
             }
             
             setUser(storedUser)
-            setOrganizations([demoOrg])
-            setCurrentOrganization(demoOrg)
-            setTrialDaysRemaining(31)
+            setOrganizations([platformAdminOrg, defaultOrg])
+            setCurrentOrganization(platformAdminOrg) // Start with platform admin
+            setTrialDaysRemaining(365)
             setLoading(false)
             return
           } else {
@@ -351,9 +365,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (isDemoMode) {
         authLog('info', 'Demo mode authentication', { email })
         
-        // Enhanced demo credentials with multiple test users
+        // Enhanced demo credentials with role-based users
         const demoUsers = {
-          'tj.analyst@gmail.com': ['Asdf123@', '123456'], // Allow both passwords
+          'tj.analyst@gmail.com': ['Asdf123@', '123456'], // Super Admin
+          'rizwan@chawla.co': ['123456', 'admin123'], // Regular Admin
           'demo@jvflow.com': 'demo123',
           'admin@jvflow.com': 'admin123',
           'test@jvflow.com': 'test123'
@@ -371,40 +386,123 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setIsSignedOut(false)
           localStorage.removeItem('userSignedOut')
           
-          // Create demo user profile directly
-          const demoUser: UserProfile = {
-            id: 'demo-user-001',
-            email: email,
-            role: 'admin',
-            name: email === 'tj.analyst@gmail.com' ? 'Muhammad TJ (Demo)' : email.split('@')[0],
-            registration_type: 'email',
-            subscription_status: 'trial',
-            trial_start_date: new Date().toISOString(),
-            trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
-            organizations: ['demo-org']
+          // Create user profile based on email
+          let userProfile: UserProfile
+          let organizations: Organization[]
+          let currentOrg: Organization
+          
+          if (email === 'tj.analyst@gmail.com') {
+            // Super Admin User
+            userProfile = {
+              id: 'super-admin-001',
+              email: 'tj.analyst@gmail.com',
+              role: 'super_admin',
+              name: 'Muhammad Tariq',
+              registration_type: 'email',
+              subscription_status: 'active',
+              trial_start_date: new Date().toISOString(),
+              trial_end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+              organizations: ['platform-admin', 'default-org']
+            }
+            
+            const platformAdminOrg: Organization = {
+              id: 'platform-admin',
+              name: 'JV-Flow Platform Administration',
+              description: 'Super admin organization for platform management',
+              industry: 'Platform Management',
+              owner_id: 'super-admin-001',
+              subscription_status: 'active',
+              trial_end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+              user_role: 'super_admin',
+              user_permissions: ['*', 'platform.*', 'super_admin.*']
+            }
+            
+            const defaultOrg: Organization = {
+              id: 'default-org',
+              name: 'Demo Real Estate Company',
+              description: 'Demo organization for testing JV-Flow features',
+              industry: 'Real Estate',
+              owner_id: 'super-admin-001',
+              subscription_status: 'active',
+              trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
+              user_role: 'admin',
+              user_permissions: ['*']
+            }
+            
+            organizations = [platformAdminOrg, defaultOrg]
+            currentOrg = platformAdminOrg // Start with platform admin
+            
+          } else if (email === 'rizwan@chawla.co') {
+            // Regular Admin User
+            userProfile = {
+              id: 'demo-user-001',
+              email: 'rizwan@chawla.co',
+              role: 'admin',
+              name: 'Rizwan Chawla',
+              registration_type: 'email',
+              subscription_status: 'trial',
+              trial_start_date: new Date().toISOString(),
+              trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
+              organizations: ['demo-org']
+            }
+            
+            const demoOrg: Organization = {
+              id: 'demo-org',
+              name: 'Chawla Real Estate Solutions',
+              description: 'Demo organization for regular admin testing',
+              industry: 'Real Estate',
+              owner_id: 'demo-user-001',
+              subscription_status: 'trial',
+              trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
+              user_role: 'admin',
+              user_permissions: ['*']
+            }
+            
+            organizations = [demoOrg]
+            currentOrg = demoOrg
+            
+          } else {
+            // Default user for other emails
+            userProfile = {
+              id: 'demo-user-generic',
+              email: email,
+              role: 'admin',
+              name: email.split('@')[0],
+              registration_type: 'email',
+              subscription_status: 'trial',
+              trial_start_date: new Date().toISOString(),
+              trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
+              organizations: ['demo-org']
+            }
+            
+            const demoOrg: Organization = {
+              id: 'demo-org',
+              name: 'Demo Organization',
+              description: 'Demo organization for testing',
+              industry: 'Real Estate',
+              owner_id: 'demo-user-generic',
+              subscription_status: 'trial',
+              trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
+              user_role: 'admin',
+              user_permissions: ['*']
+            }
+            
+            organizations = [demoOrg]
+            currentOrg = demoOrg
           }
           
-          const demoOrg: Organization = {
-            id: 'demo-org',
-            name: 'Demo Organization',
-            description: 'Demo organization for testing',
-            industry: 'Real Estate',
-            owner_id: 'demo-user-001',
-            subscription_status: 'trial',
-            trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
-            user_role: 'admin',
-            user_permissions: ['*']
-          }
+          // Calculate trial days based on user type
+          const trialDays = userProfile.role === 'super_admin' ? 365 : 31
           
           // Set user state immediately
-          setUser(demoUser)
-          setOrganizations([demoOrg])
-          setCurrentOrganization(demoOrg)
-          setTrialDaysRemaining(31)
+          setUser(userProfile)
+          setOrganizations(organizations)
+          setCurrentOrganization(currentOrg)
+          setTrialDaysRemaining(trialDays)
           setLoading(false)
           
           // Store auth state for persistence
-          const authState = { user: demoUser, timestamp: Date.now() }
+          const authState = { user: userProfile, timestamp: Date.now() }
           localStorage.setItem('demo_auth_state', JSON.stringify(authState))
           
           logger.endTimer('signin-process')
