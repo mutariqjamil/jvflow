@@ -241,13 +241,13 @@ export function AccountStatementsDashboard() {
             <TableCell>{statement.description}</TableCell>
             <TableCell className="font-medium">{statement.reference}</TableCell>
             <TableCell className={statement.debit > 0 ? 'text-red-600 font-medium' : ''}>
-              {statement.debit > 0 ? `₹${statement.debit.toLocaleString()}` : '-'}
+              {statement.debit > 0 ? `₨${statement.debit.toLocaleString()}` : '-'}
             </TableCell>
             <TableCell className={statement.credit > 0 ? 'text-green-600 font-medium' : ''}>
-              {statement.credit > 0 ? `₹${statement.credit.toLocaleString()}` : '-'}
+              {statement.credit > 0 ? `₨${statement.credit.toLocaleString()}` : '-'}
             </TableCell>
             <TableCell className={`font-medium ${statement.balance < 0 ? 'text-red-600' : 'text-green-600'}`}>
-              ₹{Math.abs(statement.balance).toLocaleString()}
+              ₨{Math.abs(statement.balance).toLocaleString()}
               {statement.balance < 0 ? ' (Dr)' : ' (Cr)'}
             </TableCell>
             <TableCell>
@@ -307,7 +307,7 @@ export function AccountStatementsDashboard() {
                     <div className="flex justify-between text-xs">
                       <span>Balance:</span>
                       <span className={`font-medium ${summary.current_balance < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                        ₹{Math.abs(summary.current_balance).toLocaleString()}
+                        ₨{Math.abs(summary.current_balance).toLocaleString()}
                         {summary.current_balance < 0 ? ' (Dr)' : ' (Cr)'}
                       </span>
                     </div>
@@ -437,7 +437,7 @@ export function AccountStatementsDashboard() {
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Total Credits</p>
                     <p className="text-2xl font-bold text-green-600">
-                      ₹{getStatementsForTab().reduce((sum, s) => sum + s.credit, 0).toLocaleString()}
+                      ₨{getStatementsForTab().reduce((sum, s) => sum + s.credit, 0).toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -450,7 +450,7 @@ export function AccountStatementsDashboard() {
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Total Debits</p>
                     <p className="text-2xl font-bold text-red-600">
-                      ₹{getStatementsForTab().reduce((sum, s) => sum + s.debit, 0).toLocaleString()}
+                      ₨{getStatementsForTab().reduce((sum, s) => sum + s.debit, 0).toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -467,7 +467,7 @@ export function AccountStatementsDashboard() {
                       getStatementsForTab()[getStatementsForTab().length - 1].balance < 0 
                         ? 'text-red-600' : 'text-green-600'
                     }`}>
-                      ₹{getStatementsForTab().length > 0 
+                      ₨{getStatementsForTab().length > 0
                         ? Math.abs(getStatementsForTab()[getStatementsForTab().length - 1].balance).toLocaleString()
                         : '0'}
                     </p>

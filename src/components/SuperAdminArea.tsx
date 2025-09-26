@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from './AuthProvider'
 import { useInternationalization } from './providers/InternationalizationProvider'
+import { useAppNavigation } from './hooks/useAppNavigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
@@ -33,8 +34,11 @@ import {
   Download,
   Mail,
   Phone,
-  MapPin
+  MapPin,
+  TestTube,
+  Database
 } from 'lucide-react'
+import { SuperAdminSettings } from './SuperAdminSettings'
 
 interface Organization {
   id: string
@@ -85,6 +89,7 @@ interface SystemMetrics {
 export function SuperAdminArea() {
   const { user } = useAuth()
   const { t } = useInternationalization()
+  const { setCurrentForm } = useAppNavigation()
   
   const [activeTab, setActiveTab] = useState('overview')
   const [organizations, setOrganizations] = useState<Organization[]>([])
@@ -344,13 +349,14 @@ export function SuperAdminArea() {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="organizations">Organizations</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="system">System</TabsTrigger>
-          </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="organizations">Organizations</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="system">System</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
@@ -755,6 +761,48 @@ export function SuperAdminArea() {
                 </div>
               </CardContent>
             </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TestTube className="h-5 w-5" />
+                  Database & Infrastructure Testing
+                </CardTitle>
+                <CardDescription>
+                  Test Supabase connectivity, database operations, and system health
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Run comprehensive tests on database connectivity, authentication, CRUD operations, 
+                    and verify all expected tables exist with proper permissions.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => setCurrentForm('supabase-test')}
+                      className="flex items-center gap-2"
+                    >
+                      <TestTube className="h-4 w-4" />
+                      Supabase Test Suite
+                    </Button>
+                    <Button 
+                      onClick={() => setCurrentForm('ui-test-suite')}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <TestTube className="h-4 w-4" />
+                      UI Test Suite
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <SuperAdminSettings />
           </TabsContent>
         </Tabs>
 

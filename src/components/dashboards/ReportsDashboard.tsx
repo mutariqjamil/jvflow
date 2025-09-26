@@ -294,9 +294,9 @@ export function ReportsDashboard() {
   const [payablesFilter, setPayablesFilter] = useState('all')
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-PK', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'PKR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value)
@@ -409,7 +409,7 @@ export function ReportsDashboard() {
                 <Building2 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$5.0M</div>
+                <div className="text-2xl font-bold">₨150.0M</div>
                 <p className="text-xs text-muted-foreground">Budget allocated</p>
               </CardContent>
             </Card>

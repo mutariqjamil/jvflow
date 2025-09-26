@@ -162,14 +162,14 @@ export function MobileDashboard({ activeTab, onTabChange, children }: MobileDash
     },
     {
       title: 'Pending Expenses',
-      value: '$24.5K',
+      value: 'PKR 2.45M',
       change: '5 awaiting approval',
       trend: 'neutral',
       color: 'bg-orange-500'
     },
     {
       title: 'Monthly Revenue',
-      value: '$156K',
+      value: 'PKR 15.6M',
       change: '+12% vs last month',
       trend: 'up',
       color: 'bg-green-500'
@@ -181,7 +181,7 @@ export function MobileDashboard({ activeTab, onTabChange, children }: MobileDash
       id: 1,
       type: 'expense',
       title: 'Construction materials approved',
-      amount: '$3,240',
+      amount: 'PKR 324K',
       time: '2h ago',
       status: 'approved'
     },

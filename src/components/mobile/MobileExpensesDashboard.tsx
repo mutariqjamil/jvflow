@@ -24,21 +24,21 @@ export function MobileExpensesDashboard() {
   const stats = [
     {
       title: 'Pending Approval',
-      value: '$24,580',
+      value: '₨737,400',
       change: '5 expenses',
       trend: 'neutral' as const,
       color: 'bg-orange-500'
     },
     {
       title: 'Approved This Month',
-      value: '$156,240',
+      value: '₨4,687,200',
       change: '+12% vs last month',
       trend: 'up' as const,
       color: 'bg-green-500'
     },
     {
       title: 'Total Spent YTD',
-      value: '$2.1M',
+      value: '₨63M',
       change: '68% of budget',
       trend: 'neutral' as const,
       color: 'bg-blue-500'
@@ -50,7 +50,7 @@ export function MobileExpensesDashboard() {
       id: '1',
       title: 'Construction Materials',
       description: 'Steel and concrete for Phase 1',
-      value: '$3,240',
+      value: '₨97,200',
       status: { text: 'Pending', variant: 'outline' as const },
       icon: <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
         <Building className="w-5 h-5 text-orange-600" />
@@ -60,7 +60,7 @@ export function MobileExpensesDashboard() {
       id: '2',
       title: 'Marketing Campaign',
       description: 'Digital ads for Q4 campaign',
-      value: '$1,850',
+      value: '₨55,500',
       status: { text: 'Approved', variant: 'default' as const, color: 'bg-green-100 text-green-800' },
       icon: <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
         <DollarSign className="w-5 h-5 text-blue-600" />
@@ -70,7 +70,7 @@ export function MobileExpensesDashboard() {
       id: '3',
       title: 'Legal Consultation',
       description: 'Contract review services',
-      value: '$750',
+      value: '₨22,500',
       status: { text: 'Rejected', variant: 'destructive' as const },
       icon: <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
         <XCircle className="w-5 h-5 text-red-600" />
@@ -80,7 +80,7 @@ export function MobileExpensesDashboard() {
       id: '4',
       title: 'Equipment Rental',
       description: 'Excavator rental for 2 weeks',
-      value: '$2,400',
+      value: '₨72,000',
       status: { text: 'Pending', variant: 'outline' as const },
       icon: <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
         <Building className="w-5 h-5 text-purple-600" />
@@ -90,7 +90,7 @@ export function MobileExpensesDashboard() {
       id: '5',
       title: 'Office Supplies',
       description: 'Monthly office supplies order',
-      value: '$340',
+      value: '₨10,200',
       status: { text: 'Approved', variant: 'default' as const, color: 'bg-green-100 text-green-800' },
       icon: <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
         <DollarSign className="w-5 h-5 text-gray-600" />
@@ -210,7 +210,7 @@ export function MobileExpensesDashboard() {
         <div className="space-y-3">
           <MobileOptimizedCard
             title="Expense Approved"
-            description="Construction materials - $3,240"
+            description="Construction materials - ₨97,200"
             subtitle="2 hours ago"
             status={{ text: 'Approved', variant: 'default', color: 'bg-green-100 text-green-800' }}
             icon={<CheckCircle className="w-5 h-5 text-green-600" />}
@@ -219,7 +219,7 @@ export function MobileExpensesDashboard() {
           
           <MobileOptimizedCard
             title="New Expense Submitted"
-            description="Marketing campaign - $1,850"
+            description="Marketing campaign - ₨55,500"
             subtitle="4 hours ago"
             status={{ text: 'Pending', variant: 'outline' }}
             icon={<Clock className="w-5 h-5 text-orange-600" />}
@@ -228,7 +228,7 @@ export function MobileExpensesDashboard() {
           
           <MobileOptimizedCard
             title="Expense Rejected"
-            description="Legal consultation - $750"
+            description="Legal consultation - ₨22,500"
             subtitle="1 day ago"
             status={{ text: 'Rejected', variant: 'destructive' }}
             icon={<XCircle className="w-5 h-5 text-red-600" />}

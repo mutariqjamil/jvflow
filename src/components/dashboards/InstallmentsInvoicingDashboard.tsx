@@ -356,16 +356,16 @@ export function InstallmentsInvoicingDashboard() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Base Amount:</span>
-                  <span>₹{selectedInvoice.amount.toLocaleString()}</span>
+                  <span>₨{selectedInvoice.amount.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax (18% GST):</span>
-                  <span>₹{selectedInvoice.tax_amount.toLocaleString()}</span>
+                  <span>₨{selectedInvoice.tax_amount.toLocaleString()}</span>
                 </div>
                 <div className="border-t pt-2">
                   <div className="flex justify-between font-medium">
                     <span>Total Amount:</span>
-                    <span>₹{selectedInvoice.total_amount.toLocaleString()}</span>
+                    <span>₨{selectedInvoice.total_amount.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -524,7 +524,7 @@ export function InstallmentsInvoicingDashboard() {
               <Clock className="h-8 w-8 text-yellow-600" />
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Pending Installments</p>
-                <p className="text-2xl font-bold">₹3.24L</p>
+                <p className="text-2xl font-bold">₨3.24L</p>
               </div>
             </div>
           </CardContent>
@@ -535,7 +535,7 @@ export function InstallmentsInvoicingDashboard() {
               <AlertTriangle className="h-8 w-8 text-red-600" />
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Overdue</p>
-                <p className="text-2xl font-bold">₹12.74L</p>
+                <p className="text-2xl font-bold">₨12.74L</p>
               </div>
             </div>
           </CardContent>
@@ -546,7 +546,7 @@ export function InstallmentsInvoicingDashboard() {
               <CheckCircle className="h-8 w-8 text-green-600" />
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Realized</p>
-                <p className="text-2xl font-bold">₹6.49L</p>
+                <p className="text-2xl font-bold">₨6.49L</p>
               </div>
             </div>
           </CardContent>
@@ -557,7 +557,7 @@ export function InstallmentsInvoicingDashboard() {
               <CreditCard className="h-8 w-8 text-blue-600" />
               <div>
                 <p className="text-sm font-medium text-muted-foreground">In Transit</p>
-                <p className="text-2xl font-bold">₹0</p>
+                <p className="text-2xl font-bold">₨0</p>
               </div>
             </div>
           </CardContent>
@@ -609,7 +609,7 @@ export function InstallmentsInvoicingDashboard() {
                         </div>
                       </TableCell>
                       <TableCell>{installment.milestone}</TableCell>
-                      <TableCell className="font-medium">₹{installment.amount.toLocaleString()}</TableCell>
+                      <TableCell className="font-medium">₨{installment.amount.toLocaleString()}</TableCell>
                       <TableCell>{installment.due_date}</TableCell>
                       <TableCell>
                         <Badge className={
@@ -702,7 +702,7 @@ export function InstallmentsInvoicingDashboard() {
                           <div className="text-sm text-muted-foreground">{invoice.unit_name}</div>
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium">₹{invoice.total_amount.toLocaleString()}</TableCell>
+                      <TableCell className="font-medium">₨{invoice.total_amount.toLocaleString()}</TableCell>
                       <TableCell>{invoice.issue_date}</TableCell>
                       <TableCell>{invoice.due_date}</TableCell>
                       <TableCell>
@@ -769,7 +769,7 @@ export function InstallmentsInvoicingDashboard() {
                       <TableRow key={payment.id}>
                         <TableCell className="font-medium">{invoice?.invoice_number}</TableCell>
                         <TableCell>{invoice?.customer_name}</TableCell>
-                        <TableCell className="font-medium">₹{payment.amount.toLocaleString()}</TableCell>
+                        <TableCell className="font-medium">₨{payment.amount.toLocaleString()}</TableCell>
                         <TableCell>{payment.payment_date}</TableCell>
                         <TableCell>{payment.payment_method.replace('_', ' ')}</TableCell>
                         <TableCell>

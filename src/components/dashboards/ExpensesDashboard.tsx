@@ -255,8 +255,8 @@ export function ExpensesDashboard() {
     setShowApprovalDialog(true)
   }
 
-  const canApprove = user?.role === 'admin' || user?.role === 'investor'
-  const canAdd = user?.role === 'builder' || user?.role === 'admin'
+  const canApprove = user?.role === 'admin' || user?.role === 'investor' || user?.role === 'super_admin'
+  const canAdd = user?.role === 'builder' || user?.role === 'admin' || user?.role === 'super_admin'
 
   return (
     <div className="space-y-6">

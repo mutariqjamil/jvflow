@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Save, Upload, Eye, Palette, Building2, FileText, Download, X, Check, Globe, DollarSign } from 'lucide-react'
+import { Save, Upload, Eye, Palette, Building2, FileText, Download, X, Check, Globe, DollarSign, Settings, Crown } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -8,9 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Textarea } from '../ui/textarea'
 import { Badge } from '../ui/badge'
+import { Switch } from '../ui/switch'
 import { ImageWithFallback } from '../figma/ImageWithFallback'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog'
 import { useInternationalization, languages, currencies } from '../providers/InternationalizationProvider'
+import { useAuth } from '../AuthProvider'
+import { useAppNavigation } from '../hooks/useAppNavigation'
 
 interface ThemeColors {
   primary: string
@@ -81,6 +84,8 @@ const defaultThemes = {
 
 export function SettingsDashboard() {
   const { language, currency, setLanguage, setCurrency, t, direction } = useInternationalization()
+  const { isDemoMode, user } = useAuth()
+  const { setActiveTab: navigateToTab } = useAppNavigation()
   
   const [branding, setBranding] = useState<OrganizationBranding>({
     project_logos: {},
@@ -95,6 +100,7 @@ export function SettingsDashboard() {
   const [isCustomTheme, setIsCustomTheme] = useState(false)
   const [previewTemplate, setPreviewTemplate] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('localization')
+  const [demoModeEnabled, setDemoModeEnabled] = useState(isDemoMode)
 
   const handleThemeChange = (themeName: string) => {
     if (themeName === 'custom') {
@@ -127,6 +133,14 @@ export function SettingsDashboard() {
         ...prev,
         project_logos: { ...prev.project_logos, [projectName]: mockUrl }
       }))
+    }
+  }
+
+  const handleDemoModeToggle = (enabled: boolean) => {
+    setDemoModeEnabled(enabled)
+    if (!enabled) {
+      // If turning off demo mode, user would need to configure Supabase
+      alert('To disable demo mode, please configure your Supabase connection in the environment variables and restart the application.')
     }
   }
 
@@ -202,8 +216,8 @@ export function SettingsDashboard() {
           <div className="grid grid-cols-4 gap-4">
             <span>Construction Progress Payment</span>
             <span>1</span>
-            <span>$125,000.00</span>
-            <span>$125,000.00</span>
+            <span>₨3,750,000.00</span>
+            <span>₨3,750,000.00</span>
           </div>
         </div>
       </div>
@@ -212,15 +226,15 @@ export function SettingsDashboard() {
         <div className="w-64">
           <div className="flex justify-between py-2 border-b">
             <span>Subtotal:</span>
-            <span>$125,000.00</span>
+            <span>₨3,750,000.00</span>
           </div>
           <div className="flex justify-between py-2 border-b">
             <span>Tax (10%):</span>
-            <span>$12,500.00</span>
+            <span>₨375,000.00</span>
           </div>
           <div className="flex justify-between py-3 font-semibold text-lg" style={{ color: branding.theme_colors.primary }}>
             <span>Total:</span>
-            <span>$137,500.00</span>
+            <span>₨4,125,000.00</span>
           </div>
         </div>
       </div>
@@ -306,15 +320,28 @@ export function SettingsDashboard() {
             {t('settings.description')}
           </p>
         </div>
-        <Button>
-          <Save className="mr-2 h-4 w-4" />
-          {t('settings.saveChanges')}
-        </Button>
+        <div className="flex items-center space-x-2">
+          {user?.role === 'super_admin' && (
+            <Button
+              variant="outline"
+              onClick={() => navigateToTab('super-admin')}
+              className="mr-2"
+            >
+              <Crown className="mr-2 h-4 w-4" />
+              Super Admin
+            </Button>
+          )}
+          <Button>
+            <Save className="mr-2 h-4 w-4" />
+            {t('settings.saveChanges')}
+          </Button>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-1">
           <TabsTrigger value="localization">{t('settings.localization')}</TabsTrigger>
+          <TabsTrigger value="system">System</TabsTrigger>
           <TabsTrigger value="theme">Color Theme</TabsTrigger>
           <TabsTrigger value="logos">Logos & Branding</TabsTrigger>
           <TabsTrigger value="templates">Templates</TabsTrigger>
@@ -411,6 +438,71 @@ export function SettingsDashboard() {
                     <div className="font-mono">{currencies[currency].symbol}1,250.50</div>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="system" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Settings className="h-5 w-5" />
+                <span>System Settings</span>
+              </CardTitle>
+              <CardDescription>
+                Configure system-level settings and application behavior
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base font-medium">Demo Mode</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Enable demo mode to use the application with sample data without requiring Supabase configuration.
+                      {isDemoMode && ' Currently running in demo mode.'}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={demoModeEnabled}
+                    onCheckedChange={handleDemoModeToggle}
+                    disabled={!isDemoMode} // Only allow toggling when actually in demo mode
+                  />
+                </div>
+                
+                {isDemoMode && (
+                  <div className="p-4 rounded-lg bg-orange-50 border border-orange-200">
+                    <div className="flex items-start space-x-2">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <div>
+                        <p className="text-sm font-medium text-orange-800">Demo Mode Active</p>
+                        <p className="text-sm text-orange-700 mt-1">
+                          You are currently running in demo mode. To connect to live data:
+                        </p>
+                        <ul className="text-sm text-orange-700 mt-2 space-y-1 list-disc list-inside ml-4">
+                          <li>Configure your Supabase project credentials in .env.local</li>
+                          <li>Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY</li>
+                          <li>Restart the application</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {!isDemoMode && (
+                  <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                    <div className="flex items-start space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <div>
+                        <p className="text-sm font-medium text-green-800">Live Mode Active</p>
+                        <p className="text-sm text-green-700 mt-1">
+                          You are connected to your Supabase database and using live data.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

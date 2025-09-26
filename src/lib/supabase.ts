@@ -1,9 +1,25 @@
 import { createClient } from '@supabase/supabase-js'
-import { projectId, publicAnonKey } from '../utils/supabase/info'
+import { 
+  projectId, 
+  publicAnonKey, 
+  supabaseUrl as configuredSupabaseUrl,
+  hasSupabaseCredentials,
+  isDevelopment,
+  isDebugMode
+} from '../utils/supabase/info'
 
-// Use the provided Supabase configuration
-const supabaseUrl = `https://${projectId}.supabase.co`
+// Use the configured Supabase URL and key
+const supabaseUrl = configuredSupabaseUrl
 const supabaseKey = publicAnonKey
+
+// Debug logging for development
+if (isDevelopment && isDebugMode) {
+  console.log('🔌 Supabase Client Setup:', {
+    hasCredentials: hasSupabaseCredentials,
+    projectId: projectId.substring(0, 8) + '...',
+    urlConfigured: !!configuredSupabaseUrl
+  })
+}
 
 // Create a mock supabase client for demo mode
 const mockSupabase = {
@@ -26,15 +42,11 @@ const mockSupabase = {
   }
 }
 
-// Check if we have real Supabase configuration (not demo placeholders)
-const hasRealSupabaseConfig = supabaseUrl && 
-  supabaseKey && 
-  projectId !== 'demo-project-id' && 
-  publicAnonKey !== 'demo-anon-key'
+// Use the environment-based configuration check
+export const isSupabaseConfigured = hasSupabaseCredentials
 
 // Connect to Supabase only with real credentials, otherwise use mock
-export const supabase = hasRealSupabaseConfig ? createClient(supabaseUrl, supabaseKey) : mockSupabase
-export const isSupabaseConfigured = hasRealSupabaseConfig
+export const supabase = hasSupabaseCredentials ? createClient(supabaseUrl, supabaseKey) : mockSupabase
 
 export type UserRole = 'investor' | 'builder' | 'marketing' | 'admin'
 

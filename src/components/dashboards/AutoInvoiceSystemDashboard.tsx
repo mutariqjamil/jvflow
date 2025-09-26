@@ -100,7 +100,7 @@ export function AutoInvoiceSystemDashboard() {
 
 Please find attached your invoice #{invoice_number} for {unit_name}.
 
-Amount Due: ₹{amount}
+Amount Due: ₨{amount}
 Due Date: {due_date}
 
 Payment can be made through:
@@ -126,7 +126,7 @@ Hi {customer_name},
 
 This is a gentle reminder that your payment for {unit_name} is due today.
 
-💰 Amount: ₹{amount}
+💰 Amount: ₨{amount}
 📅 Due Date: {due_date}
 📄 Invoice: {invoice_number}
 

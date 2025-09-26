@@ -133,7 +133,7 @@ export function MarketingCommunicationDashboard() {
       name: 'Payment Due WhatsApp',
       category: 'reminder',
       type: 'whatsapp',
-      content: '🏠 *JV-Flow Real Estate*\n\nHi {customer_name},\n\nYour payment of ₹{amount} for {unit_name} is due on {due_date}...',
+      content: '🏠 *JV-Flow Real Estate*\n\nHi {customer_name},\n\nYour payment of ₨{amount} for {unit_name} is due on {due_date}...',
       thumbnail: '/templates/payment_reminder.jpg',
       variables: ['customer_name', 'amount', 'unit_name', 'due_date'],
       usage_count: 45,
@@ -417,7 +417,7 @@ export function MarketingCommunicationDashboard() {
               <div className="space-y-1 text-sm">
                 <p><strong>Type:</strong> {selectedCampaignType} Campaign</p>
                 <p><strong>Recipients:</strong> 1,250 contacts</p>
-                <p><strong>Estimated Cost:</strong> ₹250 (₹0.20 per message)</p>
+                <p><strong>Estimated Cost:</strong> ₨250 (₨0.20 per message)</p>
               </div>
             </div>
           </TabsContent>

@@ -5,6 +5,7 @@ import { Badge } from './ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from './ui/dialog'
 import { FileText, Download, Send, Eye, Calendar, AlertCircle } from 'lucide-react'
+import { formatCurrency } from '../config/currency'
 import { toast } from 'sonner@2.0.3'
 
 interface Invoice {
@@ -149,11 +150,11 @@ export function InvoiceManager() {
                 <TableBody>
                   <TableRow>
                     <TableCell>{selectedInvoice.milestone} - {selectedInvoice.unit_name}</TableCell>
-                    <TableCell className="font-medium">₹{selectedInvoice.amount.toLocaleString()}</TableCell>
+                    <TableCell className="font-medium">{formatCurrency(selectedInvoice.amount)}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="font-medium">Total Amount</TableCell>
-                    <TableCell className="font-medium text-lg">₹{selectedInvoice.amount.toLocaleString()}</TableCell>
+                    <TableCell className="font-medium text-lg">{formatCurrency(selectedInvoice.amount)}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -267,7 +268,7 @@ export function InvoiceManager() {
                   <TableCell>{invoice.customer_name}</TableCell>
                   <TableCell>{invoice.unit_name}</TableCell>
                   <TableCell>{invoice.milestone}</TableCell>
-                  <TableCell className="font-medium">₹{invoice.amount.toLocaleString()}</TableCell>
+                  <TableCell className="font-medium">{formatCurrency(invoice.amount)}</TableCell>
                   <TableCell>{invoice.due_date}</TableCell>
                   <TableCell>
                     <Badge className={

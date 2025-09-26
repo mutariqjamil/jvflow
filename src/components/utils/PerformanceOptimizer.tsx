@@ -9,24 +9,37 @@ export const PerformanceOptimizer = {
   // Lazy load images with intersection observer
   useLazyImages: () => {
     useEffect(() => {
+      if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+        return
+      }
+
       const images = document.querySelectorAll('img[data-src]')
+      if (images.length === 0) return
       
       const imageObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const img = entry.target as HTMLImageElement
-            img.src = img.dataset.src || ''
-            img.removeAttribute('data-src')
-            imageObserver.unobserve(img)
+          if (entry.isIntersecting && entry.target instanceof HTMLImageElement) {
+            const img = entry.target
+            if (img.dataset.src) {
+              img.src = img.dataset.src
+              img.removeAttribute('data-src')
+              imageObserver.unobserve(img)
+            }
           }
         })
       }, {
         rootMargin: '50px'
       })
 
-      images.forEach(img => imageObserver.observe(img))
+      images.forEach(img => {
+        if (img instanceof HTMLImageElement) {
+          imageObserver.observe(img)
+        }
+      })
 
-      return () => imageObserver.disconnect()
+      return () => {
+        imageObserver.disconnect()
+      }
     }, [])
   },
 
@@ -48,28 +61,50 @@ export const PerformanceOptimizer = {
 
   // Monitor performance metrics
   trackPerformance: useCallback(() => {
-    if (typeof window !== 'undefined' && 'performance' in window) {
+    if (typeof window === 'undefined' || !('performance' in window) || !('PerformanceObserver' in window)) {
+      return () => {} // Return empty cleanup function
+    }
+
+    try {
       // Track Core Web Vitals
       const observer = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          if (entry.entryType === 'navigation') {
-            const navigationEntry = entry as PerformanceNavigationTiming
-            console.log('Page Load Time:', navigationEntry.loadEventEnd - navigationEntry.fetchStart, 'ms')
+        try {
+          for (const entry of list.getEntries()) {
+            if (entry.entryType === 'navigation') {
+              const navigationEntry = entry as PerformanceNavigationTiming
+              if (navigationEntry.loadEventEnd && navigationEntry.fetchStart) {
+                console.log('Page Load Time:', navigationEntry.loadEventEnd - navigationEntry.fetchStart, 'ms')
+              }
+            }
+            
+            if (entry.entryType === 'largest-contentful-paint') {
+              console.log('LCP:', entry.startTime, 'ms')
+            }
+            
+            if (entry.entryType === 'first-input') {
+              console.log('FID:', (entry as any).processingStart - entry.startTime, 'ms')
+            }
           }
-          
-          if (entry.entryType === 'largest-contentful-paint') {
-            console.log('LCP:', entry.startTime, 'ms')
-          }
-          
-          if (entry.entryType === 'first-input') {
-            console.log('FID:', (entry as any).processingStart - entry.startTime, 'ms')
-          }
+        } catch (error) {
+          // Silently handle performance measurement errors
         }
       })
 
-      observer.observe({ entryTypes: ['navigation', 'largest-contentful-paint', 'first-input'] })
+      try {
+        observer.observe({ entryTypes: ['navigation', 'largest-contentful-paint', 'first-input'] })
+      } catch (error) {
+        // Some entry types might not be supported
+      }
 
-      return () => observer.disconnect()
+      return () => {
+        try {
+          observer.disconnect()
+        } catch (error) {
+          // Handle disconnect errors
+        }
+      }
+    } catch (error) {
+      return () => {} // Return empty cleanup function on error
     }
   }, []),
 

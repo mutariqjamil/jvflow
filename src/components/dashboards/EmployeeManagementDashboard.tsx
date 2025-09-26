@@ -509,7 +509,7 @@ export function EmployeeManagementDashboard() {
                       </TableCell>
                       <TableCell>{employee.department}</TableCell>
                       <TableCell>{employee.designation}</TableCell>
-                      <TableCell>₹{employee.salary.toLocaleString()}</TableCell>
+                      <TableCell>₨{employee.salary.toLocaleString()}</TableCell>
                       <TableCell>
                         <Badge className={
                           employee.status === 'active' ? 'bg-green-100 text-green-800' :
@@ -701,11 +701,11 @@ export function EmployeeManagementDashboard() {
                           <div className="text-sm text-muted-foreground">{payroll.employee_id}</div>
                         </div>
                       </TableCell>
-                      <TableCell>₹{payroll.basic_salary.toLocaleString()}</TableCell>
-                      <TableCell>₹{payroll.allowances.toLocaleString()}</TableCell>
-                      <TableCell>₹{payroll.overtime.toLocaleString()}</TableCell>
-                      <TableCell>₹{payroll.deductions.toLocaleString()}</TableCell>
-                      <TableCell className="font-medium">₹{payroll.net_salary.toLocaleString()}</TableCell>
+                      <TableCell>₨{payroll.basic_salary.toLocaleString()}</TableCell>
+                      <TableCell>₨{payroll.allowances.toLocaleString()}</TableCell>
+                      <TableCell>₨{payroll.overtime.toLocaleString()}</TableCell>
+                      <TableCell>₨{payroll.deductions.toLocaleString()}</TableCell>
+                      <TableCell className="font-medium">₨{payroll.net_salary.toLocaleString()}</TableCell>
                       <TableCell>{payroll.days_worked}/{payroll.total_days}</TableCell>
                       <TableCell>
                         <Badge className={

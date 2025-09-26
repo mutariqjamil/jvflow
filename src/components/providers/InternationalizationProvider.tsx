@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { formatCurrency as formatCurrencyFn, getCurrencySymbol, getCurrentCurrency } from '../../config/currency'
 
 export type Language = 'en' | 'ar' | 'ur'
 export type Currency = 'USD' | 'PKR' | 'EGP' | 'SAR' | 'BHD' | 'OMR' | 'AED' | 'ZAR'
@@ -1768,22 +1769,8 @@ export function InternationalizationProvider({ children }: InternationalizationP
   }
 
   const formatCurrency = (amount: number, currencyCode?: Currency): string => {
-    const targetCurrency = currencyCode || currency
-    const currencyInfo = currencies[targetCurrency]
-    
-    try {
-      const formatter = new Intl.NumberFormat(language === 'ar' ? 'ar-SA' : language === 'ur' ? 'ur-PK' : 'en-US', {
-        style: 'currency',
-        currency: targetCurrency,
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })
-      
-      return formatter.format(amount)
-    } catch (error) {
-      // Fallback if Intl.NumberFormat fails
-      return `${currencyInfo.symbol}${amount.toLocaleString()}`
-    }
+    // Use centralized currency configuration for consistent formatting
+    return formatCurrencyFn(amount)
   }
 
   const formatNumber = (number: number): string => {

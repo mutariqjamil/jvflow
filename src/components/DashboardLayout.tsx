@@ -4,6 +4,7 @@ import { useInternationalization } from './providers/InternationalizationProvide
 import { Button } from './ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
+import { ScrollArea } from './ui/scroll-area'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { 
   DropdownMenu, 
@@ -34,6 +35,8 @@ import {
   Clock,
   CreditCard,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Truck,
   ShoppingCart,
   Target,
@@ -48,6 +51,7 @@ import { Progress } from './ui/progress'
 import { LanguageSelector } from './ui/LanguageSelector'
 import { OrganizationCreateForm } from './forms/OrganizationCreateForm'
 import { useState } from 'react'
+import { cn } from '../lib/utils'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -67,6 +71,7 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
   } = useAuth()
   const { t } = useInternationalization()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [showCreateOrg, setShowCreateOrg] = useState(false)
 
   const getRoleColor = (role: string) => {
@@ -223,10 +228,51 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
     setSidebarOpen(false) // Close sidebar on mobile when navigating
   }
 
+  const CollapsedSidebarContent = () => (
+    <div className="flex flex-col h-full">
+      <div className="p-2 border-b flex-shrink-0">
+        <div className="flex justify-center">
+          <Building2 className="h-6 w-6 text-primary" />
+        </div>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto">
+        <nav className="p-2">
+          <div className="space-y-2">
+            {Object.entries(getNavigationItems()).map(([moduleKey, module]) => (
+              <div key={moduleKey} className="space-y-1">
+                {module.items.map((item) => {
+                  const Icon = item.icon
+                  const isActive = activeTab === item.id
+                  return (
+                    <Button
+                      key={item.id}
+                      variant={isActive ? 'default' : 'ghost'}
+                      size="sm"
+                      className={`w-full h-10 p-0 justify-center transition-all ${
+                        isActive 
+                          ? 'bg-primary text-primary-foreground shadow-sm' 
+                          : 'hover:bg-muted/50'
+                      }`}
+                      onClick={() => handleTabChange(item.id)}
+                      title={item.label}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </Button>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+        </nav>
+      </div>
+    </div>
+  )
+
   const SidebarContent = () => (
-    <>
-      {/* Organization Selector */}
-      <div className="p-4 border-b">
+    <div className="flex flex-col h-full">
+      {/* Organization Selector - Fixed at top */}
+      <div className="flex-shrink-0 p-4 border-b">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -307,14 +353,15 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden">
-        <nav className="p-4 h-full">
+      {/* Scrollable Navigation Area */}
+      <div className="flex-1 overflow-y-auto">
+        <nav className="p-4 space-y-2">
           <div className="pb-2 mb-4 border-b">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               Navigation
             </p>
           </div>
-          <div className="space-y-4 overflow-y-auto h-[calc(100%-3rem)] pr-2 scrollbar-thin">
+          <div className="space-y-4 overflow-y-auto h-full pr-2 scrollbar-thin">
             {Object.entries(getNavigationItems()).map(([moduleKey, module]) => (
               <div key={moduleKey} className="space-y-2">
                 <div className="px-2 py-1">
@@ -350,21 +397,21 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
         </nav>
       </div>
       
-      {/* System Status - Demo Mode Indicator */}
+      {/* System Status - Fixed at bottom */}
       {isDemoMode && (
-        <div className="absolute bottom-4 right-4">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-3 w-56">
+        <div className="flex-shrink-0 p-4">
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <p className="text-xs font-medium text-green-700">Connected to Supabase</p>
+              <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+              <p className="text-xs font-medium text-orange-700">Demo Mode</p>
             </div>
-            <p className="text-xs text-green-600 mt-1">
-              Full functionality enabled
+            <p className="text-xs text-orange-600 mt-1">
+              Connect Supabase for full functionality
             </p>
           </div>
         </div>
       )}
-    </>
+    </div>
   )
 
   return (
@@ -382,7 +429,7 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-64">
               <div className="flex flex-col h-full">
-                <div className="flex items-center px-4 py-3 border-b">
+                <div className="flex items-center px-4 py-3 border-b flex-shrink-0">
                   <div className="flex items-center space-x-3">
                     <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
                       <Building2 className="h-5 w-5 text-primary-foreground" />
@@ -392,7 +439,7 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
                     </div>
                   </div>
                 </div>
-                <div className="flex-1 relative">
+                <div className="flex-1 overflow-hidden">
                   <SidebarContent />
                 </div>
               </div>
@@ -478,7 +525,7 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   className="cursor-pointer"
-                  onClick={() => handleTabChange('profile-settings')}
+                  onClick={() => handleTabChange('settings')}
                 >
                   <Settings className="mr-2 h-4 w-4" />
                   Account Preferences
@@ -496,9 +543,30 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
 
       <div className="flex">
         {/* Desktop Sidebar */}
-        <aside className="hidden md:block w-64 border-r bg-card/50 h-[calc(100vh-4rem)] sticky top-16">
-          <div className="relative h-full">
-            <SidebarContent />
+        <aside className={cn(
+          "hidden md:block border-r bg-card/50 h-[calc(100vh-4rem)] sticky top-16 transition-all duration-300 ease-in-out",
+          sidebarCollapsed ? "w-16" : "w-64"
+        )}>
+          <div className="relative h-full flex flex-col">
+            {/* Collapse Toggle Button */}
+            <div className="p-2 border-b flex justify-end flex-shrink-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              >
+                {sidebarCollapsed ? 
+                  <ChevronRight className="h-4 w-4" /> : 
+                  <ChevronLeft className="h-4 w-4" />
+                }
+              </Button>
+            </div>
+            
+            {/* Sidebar Content */}
+            <div className="flex-1 overflow-hidden">
+              {sidebarCollapsed ? <CollapsedSidebarContent /> : <SidebarContent />}
+            </div>
           </div>
         </aside>
 

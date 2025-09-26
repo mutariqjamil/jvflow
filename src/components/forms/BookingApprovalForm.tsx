@@ -16,6 +16,7 @@ import {
   Calendar,
   FileText
 } from 'lucide-react'
+import { formatCurrency } from '../../config/currency'
 import { toast } from 'sonner@2.0.3'
 
 interface BookingApprovalData {
@@ -168,7 +169,7 @@ export function BookingApprovalForm({
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Base Amount:</span>
-                    <span className="font-medium">₹{booking.total_amount.toLocaleString()}</span>
+                    <span className="font-medium">{formatCurrency(booking.total_amount)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Discount:</span>
@@ -176,7 +177,7 @@ export function BookingApprovalForm({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Final Amount:</span>
-                    <span className="font-bold text-lg">₹{booking.final_amount.toLocaleString()}</span>
+                    <span className="font-bold text-lg">{formatCurrency(booking.final_amount)}</span>
                   </div>
                 </div>
                 

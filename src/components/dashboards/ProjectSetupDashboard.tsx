@@ -556,7 +556,7 @@ export function ProjectSetupDashboard() {
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="project_budget">Total Project Budget (₹) *</Label>
+                <Label htmlFor="project_budget">Total Project Budget (₨) *</Label>
                 <Input
                   id="project_budget"
                   type="number"
@@ -566,7 +566,7 @@ export function ProjectSetupDashboard() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="expected_revenue">Expected Revenue (₹)</Label>
+                <Label htmlFor="expected_revenue">Expected Revenue (₨)</Label>
                 <Input
                   id="expected_revenue"
                   type="number"
@@ -578,7 +578,7 @@ export function ProjectSetupDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="land_cost">Land Acquisition Cost (₹)</Label>
+                <Label htmlFor="land_cost">Land Acquisition Cost (₨)</Label>
                 <Input
                   id="land_cost"
                   type="number"
@@ -587,7 +587,7 @@ export function ProjectSetupDashboard() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="construction_cost">Construction Cost (₹)</Label>
+                <Label htmlFor="construction_cost">Construction Cost (₨)</Label>
                 <Input
                   id="construction_cost"
                   type="number"
@@ -596,7 +596,7 @@ export function ProjectSetupDashboard() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="marketing_cost">Marketing & Sales Cost (₹)</Label>
+                <Label htmlFor="marketing_cost">Marketing & Sales Cost (₨)</Label>
                 <Input
                   id="marketing_cost"
                   type="number"
@@ -617,7 +617,7 @@ export function ProjectSetupDashboard() {
                       <div className="flex justify-between items-center">
                         <span className="text-sm">Land Acquisition</span>
                         <Badge variant="secondary">
-                          ₹{projectData.land_cost.toLocaleString()}
+                          ₨{projectData.land_cost.toLocaleString()}
                         </Badge>
                       </div>
                     )}
@@ -625,7 +625,7 @@ export function ProjectSetupDashboard() {
                       <div className="flex justify-between items-center">
                         <span className="text-sm">Construction</span>
                         <Badge variant="secondary">
-                          ₹{projectData.construction_cost.toLocaleString()}
+                          ₨{projectData.construction_cost.toLocaleString()}
                         </Badge>
                       </div>
                     )}
@@ -633,7 +633,7 @@ export function ProjectSetupDashboard() {
                       <div className="flex justify-between items-center">
                         <span className="text-sm">Marketing & Sales</span>
                         <Badge variant="secondary">
-                          ₹{projectData.marketing_cost.toLocaleString()}
+                          ₨{projectData.marketing_cost.toLocaleString()}
                         </Badge>
                       </div>
                     )}
@@ -641,7 +641,7 @@ export function ProjectSetupDashboard() {
                       <div className="flex justify-between items-center font-medium">
                         <span>Total Allocated</span>
                         <Badge>
-                          ₹{(projectData.land_cost + projectData.construction_cost + projectData.marketing_cost).toLocaleString()}
+                          ₨{(projectData.land_cost + projectData.construction_cost + projectData.marketing_cost).toLocaleString()}
                         </Badge>
                       </div>
                     </div>
@@ -732,7 +732,7 @@ export function ProjectSetupDashboard() {
                         />
                       </div>
                       <div className="space-y-2 md:col-span-2">
-                        <Label>Investment Amount (₹)</Label>
+                        <Label>Investment Amount (₨)</Label>
                         <Input
                           type="number"
                           placeholder="0"
@@ -959,7 +959,7 @@ export function ProjectSetupDashboard() {
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                       <div className="space-y-2">
-                        <Label>Basic Rate (₹/sq ft)</Label>
+                        <Label>Basic Rate (₨/sq ft)</Label>
                         <Input
                           type="number"
                           value={unit.basic_rate_per_sqft || ''}
@@ -967,7 +967,7 @@ export function ProjectSetupDashboard() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label>Pre-Launch Rate (₹/sq ft)</Label>
+                        <Label>Pre-Launch Rate (₨/sq ft)</Label>
                         <Input
                           type="number"
                           value={unit.pre_launch_rate_per_sqft || ''}
@@ -975,7 +975,7 @@ export function ProjectSetupDashboard() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label>Booking Rate (₹/sq ft)</Label>
+                        <Label>Booking Rate (₨/sq ft)</Label>
                         <Input
                           type="number"
                           value={unit.booking_rate_per_sqft || ''}
@@ -990,15 +990,15 @@ export function ProjectSetupDashboard() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                           <div>
                             <span className="text-muted-foreground">Basic Price:</span>
-                            <p className="font-medium">₹{(unit.area_sqft * unit.basic_rate_per_sqft).toLocaleString()}</p>
+                            <p className="font-medium">₨{(unit.area_sqft * unit.basic_rate_per_sqft).toLocaleString()}</p>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Pre-Launch Price:</span>
-                            <p className="font-medium">₹{(unit.area_sqft * unit.pre_launch_rate_per_sqft).toLocaleString()}</p>
+                            <p className="font-medium">₨{(unit.area_sqft * unit.pre_launch_rate_per_sqft).toLocaleString()}</p>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Booking Price:</span>
-                            <p className="font-medium">₹{(unit.area_sqft * unit.booking_rate_per_sqft).toLocaleString()}</p>
+                            <p className="font-medium">₨{(unit.area_sqft * unit.booking_rate_per_sqft).toLocaleString()}</p>
                           </div>
                         </div>
                       </div>

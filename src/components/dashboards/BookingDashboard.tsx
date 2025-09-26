@@ -216,7 +216,7 @@ export function BookingDashboard() {
               </div>
               <div className="space-y-2">
                 <Label>{t('bookings.phoneNumber')} *</Label>
-                <Input placeholder="+91 9876543210" />
+                <Input placeholder="+92 300 1234567" />
               </div>
               <div className="space-y-2">
                 <Label>{t('bookings.address')}</Label>
@@ -259,11 +259,11 @@ export function BookingDashboard() {
               </div>
               <div className="space-y-2">
                 <Label>Rate per sq ft</Label>
-                <Input value="₹4,500" disabled />
+                <Input value={formatCurrency(4500)} disabled />
               </div>
               <div className="space-y-2">
                 <Label>Base Amount</Label>
-                <Input value="₹54,00,000" disabled />
+                <Input value={formatCurrency(5400000)} disabled />
               </div>
               <div className="space-y-2">
                 <Label>Discount %</Label>
@@ -336,15 +336,15 @@ export function BookingDashboard() {
                   </div>
                   <div className="flex justify-between">
                     <span>Base Amount:</span>
-                    <span>₹54,00,000</span>
+                    <span>{formatCurrency(5400000)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Discount:</span>
-                    <span>2% (₹1,08,000)</span>
+                    <span>2% ({formatCurrency(108000)})</span>
                   </div>
                   <div className="flex justify-between font-medium">
                     <span>Final Amount:</span>
-                    <span>₹52,92,000</span>
+                    <span>{formatCurrency(5292000)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Payment Plan:</span>
@@ -352,7 +352,7 @@ export function BookingDashboard() {
                   </div>
                   <div className="flex justify-between text-green-600">
                     <span>Booking Amount Due:</span>
-                    <span>₹5,29,200</span>
+                    <span>{formatCurrency(529200)}</span>
                   </div>
                 </div>
                 
@@ -413,7 +413,7 @@ export function BookingDashboard() {
                 <SelectContent>
                   {mockInstallments.map(installment => (
                     <SelectItem key={installment.id} value={installment.id}>
-                      {installment.milestone} - ₹{installment.amount.toLocaleString()}
+                      {installment.milestone} - ₨{installment.amount.toLocaleString()}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -530,7 +530,7 @@ export function BookingDashboard() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Total Amount:</span>
-                      <span className="font-medium">₹{selectedBooking.total_amount.toLocaleString()}</span>
+                      <span className="font-medium">₨{selectedBooking.total_amount.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Discount:</span>
@@ -538,7 +538,7 @@ export function BookingDashboard() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Final Amount:</span>
-                      <span className="font-medium text-lg">₹{selectedBooking.final_amount.toLocaleString()}</span>
+                      <span className="font-medium text-lg">₨{selectedBooking.final_amount.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Payment Plan:</span>
@@ -579,7 +579,7 @@ export function BookingDashboard() {
                       .map((installment) => (
                         <TableRow key={installment.id}>
                           <TableCell>{installment.milestone}</TableCell>
-                          <TableCell className="font-medium">₹{installment.amount.toLocaleString()}</TableCell>
+                          <TableCell className="font-medium">₨{installment.amount.toLocaleString()}</TableCell>
                           <TableCell>{installment.due_date}</TableCell>
                           <TableCell>
                             <Badge className={
@@ -680,7 +680,7 @@ export function BookingDashboard() {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">₹{booking.final_amount.toLocaleString()}</div>
+                          <div className="font-medium">₨{booking.final_amount.toLocaleString()}</div>
                           {booking.discount_applied > 0 && (
                             <div className="text-sm text-green-600">
                               {booking.discount_applied}% discount
@@ -750,7 +750,7 @@ export function BookingDashboard() {
                           </div>
                         </TableCell>
                         <TableCell>{installment.milestone}</TableCell>
-                        <TableCell className="font-medium">₹{installment.amount.toLocaleString()}</TableCell>
+                        <TableCell className="font-medium">₨{installment.amount.toLocaleString()}</TableCell>
                         <TableCell>{installment.due_date}</TableCell>
                         <TableCell>
                           <Badge className={
@@ -807,7 +807,7 @@ export function BookingDashboard() {
                   <CreditCard className="h-8 w-8 text-green-600" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Realized Payments</p>
-                    <p className="text-2xl font-bold">₹55.0L</p>
+                    <p className="text-2xl font-bold">₨55.0L</p>
                   </div>
                 </div>
               </CardContent>
@@ -818,7 +818,7 @@ export function BookingDashboard() {
                   <Calendar className="h-8 w-8 text-yellow-600" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">In Transit</p>
-                    <p className="text-2xl font-bold">₹12.5L</p>
+                    <p className="text-2xl font-bold">₨12.5L</p>
                   </div>
                 </div>
               </CardContent>
@@ -829,7 +829,7 @@ export function BookingDashboard() {
                   <AlertCircle className="h-8 w-8 text-red-600" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Pending</p>
-                    <p className="text-2xl font-bold">₹28.3L</p>
+                    <p className="text-2xl font-bold">₨28.3L</p>
                   </div>
                 </div>
               </CardContent>
@@ -865,7 +865,7 @@ export function BookingDashboard() {
                             <div className="text-sm text-muted-foreground">{booking?.customer.name}</div>
                           </div>
                         </TableCell>
-                        <TableCell className="font-medium">₹{payment.amount.toLocaleString()}</TableCell>
+                        <TableCell className="font-medium">₨{payment.amount.toLocaleString()}</TableCell>
                         <TableCell>{payment.payment_date}</TableCell>
                         <TableCell>{payment.payment_method.replace('_', ' ')}</TableCell>
                         <TableCell>{payment.received_by}</TableCell>
@@ -911,8 +911,8 @@ export function BookingDashboard() {
                     return (
                       <TableRow key={target.agent_name}>
                         <TableCell className="font-medium">{target.agent_name}</TableCell>
-                        <TableCell>₹{target.monthly_target.toLocaleString()}</TableCell>
-                        <TableCell>₹{target.achieved_amount.toLocaleString()}</TableCell>
+                        <TableCell>₨{target.monthly_target.toLocaleString()}</TableCell>
+                        <TableCell>₨{target.achieved_amount.toLocaleString()}</TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
                             <span className="font-medium">{achievementPercent}%</span>
@@ -925,7 +925,7 @@ export function BookingDashboard() {
                           </div>
                         </TableCell>
                         <TableCell>{target.bookings_count}</TableCell>
-                        <TableCell>₹{target.commission_earned.toLocaleString()}</TableCell>
+                        <TableCell>₨{target.commission_earned.toLocaleString()}</TableCell>
                         <TableCell>
                           <Badge className={
                             parseFloat(achievementPercent) >= 100 ? 'bg-green-100 text-green-800' :

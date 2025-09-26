@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './components/AuthProvider'
 import { NotificationProvider } from './components/NotificationProvider'
 import { InternationalizationProvider } from './components/providers/InternationalizationProvider'
 import { AppNavigationProvider } from './components/providers/AppNavigationProvider'
 import { LoginForm } from './components/LoginForm'
+import { ResetPassword } from './components/ResetPassword'
 import { OrganizationSetup } from './components/OrganizationSetup'
 import { ResponsiveWrapper } from './components/ResponsiveWrapper'
 import { LoadingSpinner } from './components/ui/LoadingSpinner'
@@ -11,6 +13,7 @@ import { ContentRenderer } from './components/utils/ContentRenderer'
 import { useBreakpoint } from './components/ui/use-breakpoint'
 import { Toaster } from './components/ui/sonner'
 import { DEFAULT_TAB } from './components/constants/dashboardRoutes'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 function AppContent() {
   const { user, currentOrganization, loading } = useAuth()
@@ -19,6 +22,12 @@ function AppContent() {
   const [currentForm, setCurrentForm] = useState<string | null>(null)
   const breakpoint = useBreakpoint()
   const isMobile = breakpoint === 'mobile'
+  const location = useLocation()
+
+  // Handle password reset route
+  if (location.pathname === '/reset-password') {
+    return <ResetPassword />
+  }
 
   if (loading) {
     return <LoadingSpinner />
@@ -84,14 +93,20 @@ function AppContent() {
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-background">
-      <InternationalizationProvider>
-        <AuthProvider>
-          <NotificationProvider>
-            <AppContent />
-          </NotificationProvider>
-        </AuthProvider>
-      </InternationalizationProvider>
-    </div>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-background">
+        <InternationalizationProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <Router>
+                <Routes>
+                  <Route path="/*" element={<AppContent />} />
+                </Routes>
+              </Router>
+            </NotificationProvider>
+          </AuthProvider>
+        </InternationalizationProvider>
+      </div>
+    </ErrorBoundary>
   )
 }

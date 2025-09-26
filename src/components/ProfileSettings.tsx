@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from './AuthProvider'
-import { useInternationalization } from './providers/InternationalizationProvider'
+import { useInternationalization, type Currency } from './providers/InternationalizationProvider'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
@@ -79,6 +79,12 @@ export function ProfileSettings({ onClose }: ProfileSettingsProps) {
     requirePasswordChange: false
   })
 
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
+
   const handleSaveProfile = async () => {
     try {
       // Simulate API call
@@ -100,6 +106,33 @@ export function ProfileSettings({ onClose }: ProfileSettingsProps) {
 
   const handleSecurityChange = (key: string, value: string | boolean | number) => {
     setSecuritySettings(prev => ({ ...prev, [key]: value }))
+  }
+
+  const handlePasswordChange = async () => {
+    try {
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        toast.error(t('profile.passwords_dont_match') || 'Passwords do not match')
+        return
+      }
+
+      if (passwordData.newPassword.length < 8) {
+        toast.error(t('profile.password_too_short') || 'Password must be at least 8 characters long')
+        return
+      }
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      toast.success(t('profile.password_updated') || 'Password updated successfully')
+      
+      // Clear password fields
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      })
+    } catch (error) {
+      toast.error(t('profile.password_update_error') || 'Failed to update password')
+    }
   }
 
   const getUserInitials = () => {
@@ -402,6 +435,8 @@ export function ProfileSettings({ onClose }: ProfileSettingsProps) {
                           id="currentPassword"
                           type={showPassword ? "text" : "password"}
                           placeholder={t('profile.enter_current_password')}
+                          value={passwordData.currentPassword}
+                          onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
                         />
                         <Button
                           variant="ghost"
@@ -419,6 +454,8 @@ export function ProfileSettings({ onClose }: ProfileSettingsProps) {
                         id="newPassword"
                         type="password"
                         placeholder={t('profile.enter_new_password')}
+                        value={passwordData.newPassword}
+                        onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
                       />
                     </div>
                     <div className="space-y-2">
@@ -427,10 +464,16 @@ export function ProfileSettings({ onClose }: ProfileSettingsProps) {
                         id="confirmPassword"
                         type="password"
                         placeholder={t('profile.confirm_new_password')}
+                        value={passwordData.confirmPassword}
+                        onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                       />
                     </div>
                   </div>
-                  <Button variant="outline">
+                  <Button 
+                    variant="outline" 
+                    onClick={handlePasswordChange}
+                    disabled={!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+                  >
                     {t('profile.update_password')}
                   </Button>
                 </div>

@@ -35,7 +35,7 @@ const mockNotifications: Notification[] = [
   {
     id: '1',
     title: 'Expense Approval Required',
-    message: 'Steel and cement delivery expense of $15,000 needs approval',
+    message: 'Steel and cement delivery expense of PKR 1.5M needs approval',
     type: 'expense_approval',
     status: 'unread',
     created_at: new Date().toISOString(),
@@ -44,7 +44,7 @@ const mockNotifications: Notification[] = [
   {
     id: '2',
     title: 'Payment Received',
-    message: 'Customer John Smith made installment payment of $25,000',
+    message: 'Customer John Smith made installment payment of PKR 2.5M',
     type: 'payment_received',
     status: 'unread',
     created_at: new Date(Date.now() - 3600000).toISOString(),
