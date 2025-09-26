@@ -1,4 +1,3 @@
-#BismiALLAH
 # JV-Flow - Real Estate Joint Venture Management System
 
 ![JV-Flow](https://img.shields.io/badge/version-1.0.0-blue.svg)

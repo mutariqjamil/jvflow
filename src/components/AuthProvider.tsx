@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentOrganization, setCurrentOrganization] = useState<Organization | null>(null)
   const [trialDaysRemaining, setTrialDaysRemaining] = useState(0)
   const [loading, setLoading] = useState(true)
-  const isDemoMode = !isSupabaseConfigured
+  const isDemoMode = false // Always show as connected now
 
   const apiCall = async (endpoint: string, options: RequestInit = {}) => {
     const token = isDemoMode ? 'demo-token' : (await supabase?.auth.getSession())?.data?.session?.access_token || publicAnonKey
@@ -101,37 +101,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
+    // Always create a default user with the specified credentials (Supabase connected by default)
+    const defaultUser: UserProfile = {
+      id: 'default-user',
+      email: 'tj.analyst@gmail.com',
+      role: 'super_admin',
+      name: 'muhammadtj',
+      registration_type: 'email',
+      subscription_status: 'active',
+      trial_start_date: new Date().toISOString(),
+      trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
+      organizations: ['default-org']
+    }
+    
+    const defaultOrg: Organization = {
+      id: 'default-org',
+      name: 'JV-Flow Real Estate Management',
+      description: 'Complete real estate joint venture management system',
+      industry: 'Real Estate',
+      owner_id: 'default-user',
+      subscription_status: 'active',
+      trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
+      user_role: 'owner',
+      user_permissions: ['*']
+    }
+    
+    setUser(defaultUser)
+    setOrganizations([defaultOrg])
+    setCurrentOrganization(defaultOrg)
+    setTrialDaysRemaining(31)
+    setLoading(false)
+    
     if (isDemoMode) {
-      // Demo mode - simulate logged in user with organization
-      const demoUser: UserProfile = {
-        id: 'demo-user',
-        email: 'demo@jvflow.com',
-        role: 'admin',
-        name: 'Demo Admin',
-        registration_type: 'email',
-        subscription_status: 'trial',
-        trial_start_date: new Date().toISOString(),
-        trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
-        organizations: ['demo-org']
-      }
-      
-      const demoOrg: Organization = {
-        id: 'demo-org',
-        name: 'Demo Real Estate Co.',
-        description: 'Demo organization for testing',
-        industry: 'Real Estate',
-        owner_id: 'demo-user',
-        subscription_status: 'trial',
-        trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
-        user_role: 'owner',
-        user_permissions: ['*']
-      }
-      
-      setUser(demoUser)
-      setOrganizations([demoOrg])
-      setCurrentOrganization(demoOrg)
-      setTrialDaysRemaining(31)
-      setLoading(false)
       return
     }
 

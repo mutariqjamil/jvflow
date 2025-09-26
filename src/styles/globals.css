@@ -345,7 +345,7 @@ html {
 @media (max-width: 768px) {
   .mobile-content {
     /* Ensure proper spacing and touch targets on mobile */
-    --touch-target: 44px;
+    --touch-target: 48px;
   }
   
   .mobile-content .card {
@@ -358,6 +358,7 @@ html {
   
   .mobile-content input {
     min-height: var(--touch-target);
+    font-size: 16px; /* Prevents iOS zoom */
   }
   
   /* Better mobile scrolling */
@@ -379,5 +380,131 @@ html {
   
   [dir="rtl"] .mobile-content .justify-between {
     flex-direction: row-reverse;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .tablet-content {
+    /* Tablet-specific touch targets */
+    --touch-target: 44px;
+  }
+  
+  .tablet-content .card {
+    @apply shadow-sm border-0;
+  }
+  
+  .tablet-content button {
+    min-height: var(--touch-target);
+  }
+  
+  .tablet-content input {
+    min-height: var(--touch-target);
+    font-size: 16px; /* Prevents iOS zoom */
+  }
+  
+  /* Better tablet scrolling */
+  .tablet-content {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Improved tablet interactions */
+  .tablet-content [role="button"],
+  .tablet-content button,
+  .tablet-content .cursor-pointer {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Tablet grid optimizations */
+  .tablet-content .grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* RTL tablet adjustments */
+  [dir="rtl"] .tablet-content .flex {
+    flex-direction: row-reverse;
+  }
+  
+  [dir="rtl"] .tablet-content .justify-between {
+    flex-direction: row-reverse;
+  }
+}
+
+/* Enhanced responsive grid system */
+.grid-responsive {
+  @apply grid gap-4;
+  grid-template-columns: repeat(1, 1fr); /* Mobile: 1 column */
+}
+
+@media (min-width: 576px) {
+  .grid-responsive {
+    grid-template-columns: repeat(2, 1fr); /* Small tablet: 2 columns */
+  }
+}
+
+@media (min-width: 768px) {
+  .grid-responsive {
+    grid-template-columns: repeat(2, 1fr); /* Medium tablet: 2 columns */
+  }
+}
+
+@media (min-width: 992px) {
+  .grid-responsive {
+    grid-template-columns: repeat(3, 1fr); /* Large tablet: 3 columns */
+  }
+}
+
+@media (min-width: 1200px) {
+  .grid-responsive {
+    grid-template-columns: repeat(4, 1fr); /* Desktop: 4 columns */
+  }
+}
+
+/* Enhanced touch feedback */
+.touch-feedback {
+  @apply transition-all duration-200;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+.touch-feedback:active {
+  @apply scale-95 bg-gray-50;
+}
+
+/* Custom scrollbar styles */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7);
+}
+
+/* Better button styling for mobile */
+@media (max-width: 1024px) {
+  .btn-mobile {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+    font-size: 16px; /* Prevents iOS zoom */
+  }
+  
+  .input-mobile {
+    min-height: 48px;
+    font-size: 16px; /* Prevents iOS zoom */
+    padding: 12px 16px;
   }
 }

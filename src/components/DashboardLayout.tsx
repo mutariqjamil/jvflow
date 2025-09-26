@@ -38,7 +38,10 @@ import {
   ShoppingCart,
   Target,
   Palette,
-  Wrench
+  Wrench,
+  Shield,
+  Activity,
+  Crown
 } from 'lucide-react'
 import { Badge } from './ui/badge'
 import { Progress } from './ui/progress'
@@ -91,111 +94,127 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
   }
 
   const getNavigationItems = () => {
-    const baseItems = [
-      { id: 'overview', label: t('nav.overview'), icon: TrendingUp },
-    ]
-
     const userRole = currentOrganization?.user_role || user?.role
     const userPermissions = currentOrganization?.user_permissions || []
     const hasFullAccess = userPermissions.includes('*')
+
+    // Define navigation modules with grouping
+    const modules = {
+      core: {
+        title: 'Core',
+        items: [
+          { id: 'overview', label: t('nav.overview'), icon: TrendingUp },
+        ]
+      },
+      projects: {
+        title: 'Project Management',
+        items: [
+          { id: 'projects', label: 'Project Setup', icon: Building2 },
+          { id: 'milestones', label: t('nav.projectMilestones'), icon: Target },
+        ]
+      },
+      sales: {
+        title: 'Sales & Marketing',
+        items: [
+          { id: 'bookings', label: t('nav.bookings'), icon: Calendar },
+          { id: 'sales', label: t('nav.sales'), icon: TrendingUp },
+          { id: 'marketing', label: 'Marketing Communication', icon: Mail },
+          { id: 'commissions', label: t('nav.commissions'), icon: Percent },
+        ]
+      },
+      financial: {
+        title: 'Financial Management',
+        items: [
+          { id: 'installments', label: 'Installments & Invoicing', icon: Clock },
+          { id: 'expenses', label: t('nav.expenses'), icon: DollarSign },
+          { id: 'invoices', label: 'Auto Invoices', icon: Zap },
+          { id: 'statements', label: 'Account Statements', icon: BarChart3 },
+        ]
+      },
+      operations: {
+        title: 'Operations',
+        items: [
+          { id: 'vendors', label: t('nav.vendorManagement'), icon: Truck },
+          { id: 'materials', label: t('nav.materialManagement'), icon: Package },
+          { id: 'procurement', label: t('nav.procurement'), icon: ShoppingCart },
+          { id: 'purchase-orders', label: t('nav.purchaseOrders'), icon: FileText },
+        ]
+      },
+      management: {
+        title: 'User Management',
+        items: [
+          { id: 'employees', label: 'Employee Management', icon: UserCog },
+          { id: 'users', label: t('nav.userManagement'), icon: Users },
+          { id: 'user-roles', label: 'User Roles & Access', icon: Shield },
+        ]
+      },
+      system: {
+        title: 'System',
+        items: [
+          { id: 'audit-trail', label: 'Audit Trail', icon: Activity },
+          { id: 'reports', label: t('nav.reports'), icon: BarChart3 },
+          { id: 'settings', label: t('nav.settings'), icon: Settings },
+          ...(user?.role === 'super_admin' ? [{ id: 'super-admin', label: 'Super Admin', icon: Crown }] : []),
+        ]
+      }
+    }
 
     // Role-based navigation with RBAC/ABAC
     switch (userRole) {
       case 'owner':
       case 'admin':
-        return [
-          ...baseItems,
-          { id: 'projects', label: 'Project Setup', icon: Building2 },
-          { id: 'milestones', label: t('nav.projectMilestones'), icon: Target },
-          { id: 'bookings', label: t('nav.bookings'), icon: Calendar },
-          { id: 'installments', label: 'Installments & Invoicing', icon: Clock },
-          { id: 'expenses', label: t('nav.expenses'), icon: DollarSign },
-          { id: 'invoices', label: 'Auto Invoices', icon: Zap },
-          { id: 'statements', label: 'Account Statements', icon: BarChart3 },
-          { id: 'vendors', label: t('nav.vendorManagement'), icon: Truck },
-          { id: 'materials', label: t('nav.materialManagement'), icon: Package },
-          { id: 'procurement', label: t('nav.procurement'), icon: ShoppingCart },
-          { id: 'purchase-orders', label: t('nav.purchaseOrders'), icon: FileText },
-          { id: 'employees', label: 'Employee Management', icon: UserCog },
-          { id: 'users', label: t('nav.userManagement'), icon: Users },
-          { id: 'marketing', label: 'Marketing Communication', icon: Mail },
-          { id: 'reports', label: t('nav.reports'), icon: BarChart3 },
-          { id: 'settings', label: t('nav.settings'), icon: Settings },
-        ]
+        return modules
       case 'billing_manager':
-        return [
-          ...baseItems,
-          { id: 'expenses', label: t('expenses.title'), icon: DollarSign },
-          { id: 'invoices', label: 'Auto Invoices', icon: Zap },
-          { id: 'statements', label: 'Account Statements', icon: BarChart3 },
-          { id: 'reports', label: 'Financial Reports', icon: FileText },
-        ]
+        return {
+          core: modules.core,
+          financial: modules.financial,
+          system: { ...modules.system, items: modules.system.items.filter(item => item.id === 'reports') }
+        }
       case 'marketing_manager':
-        return [
-          ...baseItems,
-          { id: 'bookings', label: t('nav.bookings'), icon: Calendar },
-          { id: 'sales', label: t('nav.sales'), icon: TrendingUp },
-          { id: 'marketing', label: 'Marketing Communication', icon: Mail },
-          { id: 'commissions', label: t('nav.commissions'), icon: Percent },
-          { id: 'customers', label: 'Customer Management', icon: Users },
-        ]
+        return {
+          core: modules.core,
+          sales: modules.sales
+        }
       case 'accounts_manager':
-        return [
-          ...baseItems,
-          { id: 'expenses', label: 'Expense Approvals', icon: DollarSign },
-          { id: 'statements', label: 'Account Statements', icon: BarChart3 },
-          { id: 'reports', label: 'Financial Reports', icon: FileText },
-        ]
+        return {
+          core: modules.core,
+          financial: { ...modules.financial, items: modules.financial.items.filter(item => ['expenses', 'statements'].includes(item.id)) },
+          system: { ...modules.system, items: modules.system.items.filter(item => item.id === 'reports') }
+        }
       case 'project_manager':
-        return [
-          ...baseItems,
-          { id: 'projects', label: 'Project Management', icon: Building2 },
-          { id: 'milestones', label: t('nav.projectMilestones'), icon: Target },
-          { id: 'expenses', label: 'Project Expenses', icon: DollarSign },
-          { id: 'materials', label: t('nav.materialManagement'), icon: Package },
-          { id: 'procurement', label: t('nav.procurement'), icon: ShoppingCart },
-          { id: 'purchase-orders', label: t('nav.purchaseOrders'), icon: FileText },
-          { id: 'vendors', label: t('nav.vendorManagement'), icon: Truck },
-          { id: 'employees', label: 'Team Management', icon: UserCog },
-          { id: 'inventory', label: 'Project Inventory', icon: Package },
-          { id: 'reports', label: 'Project Reports', icon: FileText },
-        ]
+        return {
+          core: modules.core,
+          projects: modules.projects,
+          financial: { ...modules.financial, items: modules.financial.items.filter(item => item.id === 'expenses') },
+          operations: modules.operations,
+          management: { ...modules.management, items: modules.management.items.filter(item => item.id === 'employees') },
+          system: { ...modules.system, items: modules.system.items.filter(item => item.id === 'reports') }
+        }
       case 'investor':
-        return [
-          ...baseItems,
-          { id: 'financial', label: 'Financial Overview', icon: DollarSign },
-          { id: 'expenses', label: 'Expense Approvals', icon: DollarSign },
-          { id: 'statements', label: 'Investment Statements', icon: BarChart3 },
-          { id: 'reports', label: 'Investment Reports', icon: FileText },
-        ]
+        return {
+          core: modules.core,
+          financial: { ...modules.financial, items: modules.financial.items.filter(item => ['expenses', 'statements'].includes(item.id)) },
+          system: { ...modules.system, items: modules.system.items.filter(item => item.id === 'reports') }
+        }
       case 'builder':
-        return [
-          ...baseItems,
-          { id: 'projects', label: 'Construction Projects', icon: Building2 },
-          { id: 'milestones', label: 'Project Milestones', icon: Target },
-          { id: 'expenses', label: 'Construction Expenses', icon: DollarSign },
-          { id: 'materials', label: 'Material Management', icon: Package },
-          { id: 'procurement', label: 'Procurement', icon: ShoppingCart },
-          { id: 'purchase-orders', label: 'Purchase Orders', icon: FileText },
-          { id: 'vendors', label: 'Vendor Management', icon: Truck },
-          { id: 'employees', label: 'Workforce Management', icon: UserCog },
-          { id: 'inventory', label: 'Materials & Inventory', icon: Package },
-          { id: 'reports', label: 'Construction Reports', icon: FileText },
-        ]
+        return {
+          core: modules.core,
+          projects: modules.projects,
+          financial: { ...modules.financial, items: modules.financial.items.filter(item => item.id === 'expenses') },
+          operations: modules.operations,
+          management: { ...modules.management, items: modules.management.items.filter(item => item.id === 'employees') },
+          system: { ...modules.system, items: modules.system.items.filter(item => item.id === 'reports') }
+        }
       case 'marketing':
-        return [
-          ...baseItems,
-          { id: 'bookings', label: 'Lead Management', icon: Calendar },
-          { id: 'sales', label: 'Sales Pipeline', icon: TrendingUp },
-          { id: 'marketing', label: 'Marketing Campaigns', icon: Mail },
-          { id: 'commissions', label: 'Commission Tracking', icon: Percent },
-          { id: 'customers', label: 'Customer Relations', icon: Users },
-        ]
+        return {
+          core: modules.core,
+          sales: modules.sales
+        }
       default:
-        return [
-          ...baseItems,
-          ...(hasFullAccess || userPermissions.includes('projects') ? [{ id: 'projects', label: 'Project Setup', icon: Building2 }] : [])
-        ]
+        return {
+          core: modules.core,
+          ...(hasFullAccess || userPermissions.includes('projects') ? { projects: modules.projects } : {})
+        }
     }
   }
 
@@ -205,9 +224,9 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
   }
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      {/* Organization Selector - Fixed at top */}
-      <div className="flex-shrink-0 p-4 border-b">
+    <>
+      {/* Organization Selector */}
+      <div className="p-4 border-b">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -288,51 +307,64 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
         </div>
       </div>
 
-      {/* Scrollable Navigation Area */}
-      <div className="flex-1 overflow-y-auto">
-        <nav className="p-4 space-y-2">
+      <div className="flex-1 overflow-hidden">
+        <nav className="p-4 h-full">
           <div className="pb-2 mb-4 border-b">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               Navigation
             </p>
           </div>
-          {getNavigationItems().map((item) => {
-            const Icon = item.icon
-            const isActive = activeTab === item.id
-            return (
-              <Button
-                key={item.id}
-                variant={isActive ? 'default' : 'ghost'}
-                className={`w-full justify-start transition-all ${
-                  isActive 
-                    ? 'bg-primary text-primary-foreground shadow-sm' 
-                    : 'hover:bg-muted/50'
-                }`}
-                onClick={() => handleTabChange(item.id)}
-              >
-                <Icon className="mr-3 h-4 w-4" />
-                <span className="text-sm font-medium">{item.label}</span>
-              </Button>
-            )
-          })}
+          <div className="space-y-4 overflow-y-auto h-[calc(100%-3rem)] pr-2 scrollbar-thin">
+            {Object.entries(getNavigationItems()).map(([moduleKey, module]) => (
+              <div key={moduleKey} className="space-y-2">
+                <div className="px-2 py-1">
+                  <p className="text-xs font-medium text-muted-foreground/80 uppercase tracking-wide">
+                    {module.title}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  {module.items.map((item) => {
+                    const Icon = item.icon
+                    const isActive = activeTab === item.id
+                    return (
+                      <Button
+                        key={item.id}
+                        variant={isActive ? 'default' : 'ghost'}
+                        size="sm"
+                        className={`w-full justify-start transition-all text-xs ${
+                          isActive 
+                            ? 'bg-primary text-primary-foreground shadow-sm' 
+                            : 'hover:bg-muted/50'
+                        }`}
+                        onClick={() => handleTabChange(item.id)}
+                      >
+                        <Icon className="mr-2 h-3.5 w-3.5" />
+                        <span className="font-medium">{item.label}</span>
+                      </Button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
         </nav>
       </div>
       
-      {/* System Status - Fixed at bottom */}
+      {/* System Status - Demo Mode Indicator */}
       {isDemoMode && (
-        <div className="flex-shrink-0 p-4">
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+        <div className="absolute bottom-4 right-4">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3 w-56">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-              <p className="text-xs font-medium text-orange-700">Demo Mode</p>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <p className="text-xs font-medium text-green-700">Connected to Supabase</p>
             </div>
-            <p className="text-xs text-orange-600 mt-1">
-              Connect Supabase for full functionality
+            <p className="text-xs text-green-600 mt-1">
+              Full functionality enabled
             </p>
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 
   return (
@@ -350,7 +382,7 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-64">
               <div className="flex flex-col h-full">
-                <div className="flex items-center px-4 py-3 border-b flex-shrink-0">
+                <div className="flex items-center px-4 py-3 border-b">
                   <div className="flex items-center space-x-3">
                     <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
                       <Building2 className="h-5 w-5 text-primary-foreground" />
@@ -360,7 +392,7 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
                     </div>
                   </div>
                 </div>
-                <div className="flex-1 overflow-hidden">
+                <div className="flex-1 relative">
                   <SidebarContent />
                 </div>
               </div>
@@ -437,11 +469,17 @@ export function DashboardLayout({ children, activeTab, onTabChange }: DashboardL
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => handleTabChange('profile-settings')}
+                >
                   <User className="mr-2 h-4 w-4" />
                   Profile Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => handleTabChange('profile-settings')}
+                >
                   <Settings className="mr-2 h-4 w-4" />
                   Account Preferences
                 </DropdownMenuItem>

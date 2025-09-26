@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
+import { projectId, publicAnonKey } from '../utils/supabase/info'
 
-// Simple environment variable access with defaults
-const supabaseUrl = ''
-const supabaseKey = ''
+// Use the provided Supabase configuration
+const supabaseUrl = `https://${projectId}.supabase.co`
+const supabaseKey = publicAnonKey
 
 // Create a mock supabase client for demo mode
 const mockSupabase = {
@@ -14,9 +15,9 @@ const mockSupabase = {
   }
 }
 
-// Always use mock for demo mode since we don't have real env vars
-export const supabase = mockSupabase
-export const isSupabaseConfigured = false
+// Connect to Supabase by default with provided credentials
+export const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : mockSupabase
+export const isSupabaseConfigured = !!(supabaseUrl && supabaseKey)
 
 export type UserRole = 'investor' | 'builder' | 'marketing' | 'admin'
 

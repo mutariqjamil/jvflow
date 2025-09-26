@@ -44,28 +44,28 @@ export function OverviewDashboard() {
       case 'investor':
         return [
           {
-            title: 'Total Investment',
+            title: t('overview.totalInvestment'),
             value: formatCurrency(mockProjectData.totalInvested),
             icon: DollarSign,
             trend: '+12%',
             trendColor: 'text-green-600'
           },
           {
-            title: 'Current Cash Balance',
+            title: t('overview.currentCashBalance'),
             value: formatCurrency(mockProjectData.cashBalance),
             icon: TrendingUp,
             trend: '+5%',
             trendColor: 'text-green-600'
           },
           {
-            title: 'Total Expenses',
+            title: t('overview.totalExpenses'),
             value: formatCurrency(mockProjectData.totalExpenses),
             icon: DollarSign,
             trend: '+8%',
             trendColor: 'text-orange-600'
           },
           {
-            title: 'Project Revenue',
+            title: t('overview.projectRevenue'),
             value: formatCurrency(mockProjectData.totalRevenue),
             icon: TrendingUp,
             trend: '+15%',
@@ -76,31 +76,31 @@ export function OverviewDashboard() {
       case 'builder':
         return [
           {
-            title: 'Budget Remaining',
+            title: t('overview.budgetRemaining'),
             value: formatCurrency(mockProjectData.totalBudget - mockProjectData.totalExpenses),
             icon: DollarSign,
             trend: `${budgetUtilization.toFixed(1)}% used`,
             trendColor: budgetUtilization > 80 ? 'text-red-600' : 'text-green-600'
           },
           {
-            title: 'Monthly Expenses',
+            title: t('overview.monthlyExpenses'),
             value: formatCurrency(mockProjectData.monthlyExpenses),
             icon: TrendingUp,
             trend: '-5%',
             trendColor: 'text-green-600'
           },
           {
-            title: 'Pending Approvals',
+            title: t('overview.pendingApprovals'),
             value: mockProjectData.pendingApprovals.toString(),
             icon: AlertTriangle,
-            trend: '3 waiting',
+            trend: t('overview.waiting', { count: 3 }),
             trendColor: 'text-orange-600'
           },
           {
-            title: 'Cash Available',
+            title: t('overview.cashAvailable'),
             value: formatCurrency(mockProjectData.cashBalance),
             icon: CheckCircle,
-            trend: 'Available',
+            trend: t('overview.available'),
             trendColor: 'text-green-600'
           }
         ]
@@ -108,31 +108,31 @@ export function OverviewDashboard() {
       case 'marketing':
         return [
           {
-            title: 'Units Booked',
+            title: t('overview.unitsBooked'),
             value: `${mockProjectData.unitsBooked}/${mockProjectData.unitsTotal}`,
             icon: Building2,
             trend: `${salesProgress.toFixed(1)}%`,
             trendColor: 'text-green-600'
           },
           {
-            title: 'Monthly Sales',
+            title: t('overview.monthlySales'),
             value: formatCurrency(mockProjectData.monthlyRevenue),
             icon: TrendingUp,
             trend: '+22%',
             trendColor: 'text-green-600'
           },
           {
-            title: 'Commission Earned',
+            title: t('overview.commissionEarned'),
             value: formatCurrency(mockProjectData.totalRevenue * 0.05),
             icon: DollarSign,
             trend: '+18%',
             trendColor: 'text-green-600'
           },
           {
-            title: 'Active Customers',
+            title: t('overview.activeCustomers'),
             value: (mockProjectData.unitsBooked + 8).toString(),
             icon: Users,
-            trend: '+3 this week',
+            trend: t('overview.thisWeek', { count: 3 }),
             trendColor: 'text-green-600'
           }
         ]
@@ -140,28 +140,28 @@ export function OverviewDashboard() {
       default: // admin
         return [
           {
-            title: 'Total Budget',
+            title: t('overview.totalBudget'),
             value: formatCurrency(mockProjectData.totalBudget),
             icon: DollarSign,
-            trend: 'Allocated',
+            trend: t('overview.allocated'),
             trendColor: 'text-blue-600'
           },
           {
-            title: 'Cash Balance',
+            title: t('overview.cashBalance'),
             value: formatCurrency(mockProjectData.cashBalance),
             icon: TrendingUp,
             trend: '+5%',
             trendColor: 'text-green-600'
           },
           {
-            title: 'Units Booked',
+            title: t('overview.unitsBooked'),
             value: `${mockProjectData.unitsBooked}/${mockProjectData.unitsTotal}`,
             icon: Building2,
             trend: `${salesProgress.toFixed(1)}%`,
             trendColor: 'text-green-600'
           },
           {
-            title: 'Net Revenue',
+            title: t('overview.netRevenue'),
             value: formatCurrency(mockProjectData.totalRevenue - mockProjectData.totalExpenses),
             icon: TrendingUp,
             trend: '+12%',
@@ -176,7 +176,7 @@ export function OverviewDashboard() {
       <div>
         <h2 className="text-2xl font-bold tracking-tight">{t('overview.title')}</h2>
         <p className="text-muted-foreground">
-          Welcome back, {user?.name}. Here's what's happening with your projects.
+          {t('overview.welcomeBack', { name: user?.name })}
         </p>
       </div>
 
@@ -207,9 +207,12 @@ export function OverviewDashboard() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Budget Utilization</CardTitle>
+            <CardTitle>{t('overview.budgetUtilization')}</CardTitle>
             <CardDescription>
-              {formatCurrency(mockProjectData.totalExpenses)} of {formatCurrency(mockProjectData.totalBudget)} used
+              {t('overview.budgetUsed', { 
+                used: formatCurrency(mockProjectData.totalExpenses), 
+                total: formatCurrency(mockProjectData.totalBudget) 
+              })}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -226,19 +229,22 @@ export function OverviewDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Sales Progress</CardTitle>
+            <CardTitle>{t('overview.salesProgress')}</CardTitle>
             <CardDescription>
-              {mockProjectData.unitsBooked} of {mockProjectData.unitsTotal} units booked
+              {t('overview.unitsBookedOf', { 
+                booked: mockProjectData.unitsBooked, 
+                total: mockProjectData.unitsTotal 
+              })}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Progress value={salesProgress} className="w-full" />
             <div className="flex justify-between text-sm text-muted-foreground mt-2">
-              <span>0 units</span>
+              <span>0 {t('overview.units')}</span>
               <span className="text-green-600">
-                {mockProjectData.unitsBooked} units
+                {mockProjectData.unitsBooked} {t('overview.units')}
               </span>
-              <span>{mockProjectData.unitsTotal} units</span>
+              <span>{mockProjectData.unitsTotal} {t('overview.units')}</span>
             </div>
           </CardContent>
         </Card>
@@ -247,34 +253,34 @@ export function OverviewDashboard() {
       {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-          <CardDescription>Latest updates from your projects</CardDescription>
+          <CardTitle>{t('overview.recentActivity')}</CardTitle>
+          <CardDescription>{t('overview.recentActivityDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {[
               {
-                action: 'New unit booking',
-                details: 'Unit B-205 booked by John Smith',
-                time: '2 hours ago',
+                action: t('overview.newUnitBooking'),
+                details: t('overview.unitBookedBy', { unit: 'B-205', customer: 'John Smith' }),
+                time: t('overview.hoursAgo', { hours: 2 }),
                 status: 'success'
               },
               {
-                action: 'Expense approval pending',
-                details: 'Construction materials - $15,000',
-                time: '4 hours ago',
+                action: t('overview.expenseApprovalPending'),
+                details: t('overview.constructionMaterials', { amount: formatCurrency(15000) }),
+                time: t('overview.hoursAgo', { hours: 4 }),
                 status: 'warning'
               },
               {
-                action: 'Payment received',
-                details: 'Installment payment from Sarah Johnson',
-                time: '6 hours ago',
+                action: t('overview.paymentReceived'),
+                details: t('overview.installmentPayment', { customer: 'Sarah Johnson' }),
+                time: t('overview.hoursAgo', { hours: 6 }),
                 status: 'success'
               },
               {
-                action: 'Budget milestone reached',
-                details: '75% of construction budget utilized',
-                time: '1 day ago',
+                action: t('overview.budgetMilestone'),
+                details: t('overview.budgetUtilized', { percent: 75 }),
+                time: t('overview.dayAgo', { days: 1 }),
                 status: 'info'
               }
             ].map((activity, index) => (

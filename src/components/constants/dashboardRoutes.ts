@@ -19,6 +19,10 @@ import { PurchaseOrderDashboard } from '../dashboards/PurchaseOrderDashboard'
 import { ProjectMilestonesDashboard } from '../dashboards/ProjectMilestonesDashboard'
 import { SettingsDashboard } from '../dashboards/SettingsDashboard'
 import { MobileExpensesDashboard } from '../mobile/MobileExpensesDashboard'
+import { ProfileSettings } from '../ProfileSettings'
+import { SuperAdminArea } from '../SuperAdminArea'
+import { UserRoleManagement } from '../UserRoleManagement'
+import { AuditTrail } from '../AuditTrail'
 
 export const DASHBOARD_COMPONENTS = {
   overview: OverviewDashboard,
@@ -44,6 +48,10 @@ export const DASHBOARD_COMPONENTS = {
   customers: BookingDashboard,
   marketing: MarketingCommunicationDashboard,
   settings: SettingsDashboard,
+  'profile-settings': ProfileSettings,
+  'super-admin': SuperAdminArea,
+  'user-roles': UserRoleManagement,
+  'audit-trail': AuditTrail,
 } as const
 
 export const DEFAULT_TAB = 'overview'

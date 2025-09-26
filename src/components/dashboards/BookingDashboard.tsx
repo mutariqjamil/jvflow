@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { AlertCircle, Calendar, CreditCard, FileText, Plus, Receipt, Target, TrendingUp, User, Download } from 'lucide-react'
 import { toast } from 'sonner@2.0.3'
+import { useInternationalization } from '../providers/InternationalizationProvider'
 
 interface Customer {
   id: string
@@ -68,6 +69,7 @@ interface SalesTarget {
 }
 
 export function BookingDashboard() {
+  const { t, formatCurrency } = useInternationalization()
   const [activeTab, setActiveTab] = useState('bookings')
   const [showNewBooking, setShowNewBooking] = useState(false)
   const [showPaymentEntry, setShowPaymentEntry] = useState(false)
@@ -188,37 +190,37 @@ export function BookingDashboard() {
     <Dialog open={showNewBooking} onOpenChange={setShowNewBooking}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>New Unit Booking</DialogTitle>
+          <DialogTitle>{t('bookings.newUnitBooking')}</DialogTitle>
           <DialogDescription>
-            Create a new booking by entering customer details, selecting a unit, and choosing a payment plan.
+            {t('bookings.newBookingDescription')}
           </DialogDescription>
         </DialogHeader>
         
         <Tabs defaultValue="customer" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="customer">Customer Details</TabsTrigger>
-            <TabsTrigger value="unit">Unit Selection</TabsTrigger>
-            <TabsTrigger value="payment">Payment Plan</TabsTrigger>
-            <TabsTrigger value="confirm">Confirmation</TabsTrigger>
+            <TabsTrigger value="customer">{t('bookings.customerDetails')}</TabsTrigger>
+            <TabsTrigger value="unit">{t('bookings.unitSelection')}</TabsTrigger>
+            <TabsTrigger value="payment">{t('bookings.paymentPlan')}</TabsTrigger>
+            <TabsTrigger value="confirm">{t('bookings.confirmation')}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="customer" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Customer Name *</Label>
-                <Input placeholder="Full name" />
+                <Label>{t('bookings.customerName')} *</Label>
+                <Input placeholder={t('bookings.fullName')} />
               </div>
               <div className="space-y-2">
-                <Label>Email *</Label>
+                <Label>{t('bookings.email')} *</Label>
                 <Input type="email" placeholder="customer@email.com" />
               </div>
               <div className="space-y-2">
-                <Label>Phone Number *</Label>
+                <Label>{t('bookings.phoneNumber')} *</Label>
                 <Input placeholder="+91 9876543210" />
               </div>
               <div className="space-y-2">
-                <Label>Address</Label>
-                <Input placeholder="Complete address" />
+                <Label>{t('bookings.address')}</Label>
+                <Input placeholder={t('bookings.completeAddress')} />
               </div>
             </div>
           </TabsContent>

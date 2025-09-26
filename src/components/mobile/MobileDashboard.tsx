@@ -22,9 +22,19 @@ import {
   Filter,
   Package,
   Truck,
-  Target
+  Target,
+  Clock,
+  Zap,
+  BarChart3,
+  UserCog,
+  Shield,
+  Activity,
+  Mail,
+  Percent,
+  Crown
 } from 'lucide-react'
 import { useAuth } from '../AuthProvider'
+import { useInternationalization } from '../providers/InternationalizationProvider'
 
 interface MobileDashboardProps {
   activeTab: string
@@ -34,20 +44,113 @@ interface MobileDashboardProps {
 
 export function MobileDashboard({ activeTab, onTabChange, children }: MobileDashboardProps) {
   const { user, currentOrganization } = useAuth()
+  const { t } = useInternationalization()
   const [searchOpen, setSearchOpen] = useState(false)
 
-  const menuItems = [
-    { id: 'overview', label: 'Overview', icon: Home, color: 'text-blue-600' },
-    { id: 'projects', label: 'Projects', icon: Building2, color: 'text-purple-600', badge: 3 },
-    { id: 'milestones', label: 'Milestones', icon: Target, color: 'text-indigo-600' },
-    { id: 'expenses', label: 'Expenses', icon: DollarSign, color: 'text-green-600', badge: 5 },
-    { id: 'materials', label: 'Materials', icon: Package, color: 'text-blue-600' },
-    { id: 'procurement', label: 'Procurement', icon: ShoppingCart, color: 'text-orange-600' },
-    { id: 'vendors', label: 'Vendors', icon: Truck, color: 'text-gray-600' },
-    { id: 'sales', label: 'Sales', icon: ShoppingCart, color: 'text-orange-600' },
-    { id: 'reports', label: 'Reports', icon: FileText, color: 'text-indigo-600' },
-    { id: 'users', label: 'Team', icon: Users, color: 'text-pink-600' },
-  ]
+  const getNavigationModules = () => {
+    const userRole = currentOrganization?.user_role || user?.role
+    
+    const modules = {
+      core: {
+        title: 'Core',
+        items: [
+          { id: 'overview', label: t('nav.overview'), icon: TrendingUp, color: 'text-blue-600' },
+        ]
+      },
+      projects: {
+        title: 'Projects',
+        items: [
+          { id: 'projects', label: 'Project Setup', icon: Building2, color: 'text-purple-600', badge: 3 },
+          { id: 'milestones', label: t('nav.projectMilestones'), icon: Target, color: 'text-indigo-600' },
+        ]
+      },
+      sales: {
+        title: 'Sales',
+        items: [
+          { id: 'bookings', label: t('nav.bookings'), icon: Calendar, color: 'text-green-600' },
+          { id: 'sales', label: t('nav.sales'), icon: TrendingUp, color: 'text-orange-600' },
+          { id: 'marketing', label: 'Marketing', icon: Mail, color: 'text-pink-600' },
+          { id: 'commissions', label: t('nav.commissions'), icon: Percent, color: 'text-yellow-600' },
+        ]
+      },
+      financial: {
+        title: 'Financial',
+        items: [
+          { id: 'installments', label: 'Installments', icon: Clock, color: 'text-blue-600' },
+          { id: 'expenses', label: t('nav.expenses'), icon: DollarSign, color: 'text-green-600', badge: 5 },
+          { id: 'invoices', label: 'Auto Invoices', icon: Zap, color: 'text-yellow-600' },
+          { id: 'statements', label: 'Statements', icon: BarChart3, color: 'text-purple-600' },
+        ]
+      },
+      operations: {
+        title: 'Operations',
+        items: [
+          { id: 'vendors', label: t('nav.vendorManagement'), icon: Truck, color: 'text-gray-600' },
+          { id: 'materials', label: t('nav.materialManagement'), icon: Package, color: 'text-blue-600' },
+          { id: 'procurement', label: t('nav.procurement'), icon: ShoppingCart, color: 'text-orange-600' },
+          { id: 'purchase-orders', label: t('nav.purchaseOrders'), icon: FileText, color: 'text-indigo-600' },
+        ]
+      },
+      management: {
+        title: 'Management',
+        items: [
+          { id: 'employees', label: 'Employees', icon: UserCog, color: 'text-pink-600' },
+          { id: 'users', label: t('nav.userManagement'), icon: Users, color: 'text-pink-600' },
+          { id: 'user-roles', label: 'Roles & Access', icon: Shield, color: 'text-red-600' },
+        ]
+      },
+      system: {
+        title: 'System',
+        items: [
+          { id: 'audit-trail', label: 'Audit Trail', icon: Activity, color: 'text-gray-600' },
+          { id: 'reports', label: t('nav.reports'), icon: FileText, color: 'text-indigo-600' },
+          { id: 'settings', label: t('nav.settings'), icon: Settings, color: 'text-gray-500' },
+          ...(user?.role === 'super_admin' ? [{ id: 'super-admin', label: 'Super Admin', icon: Crown, color: 'text-yellow-600' }] : []),
+        ]
+      }
+    }
+
+    // Role-based access control
+    switch (userRole) {
+      case 'owner':
+      case 'admin':
+        return modules
+      case 'billing_manager':
+        return {
+          core: modules.core,
+          financial: modules.financial,
+          system: { ...modules.system, items: modules.system.items.filter(item => item.id === 'reports') }
+        }
+      case 'marketing_manager':
+        return {
+          core: modules.core,
+          sales: modules.sales
+        }
+      case 'accounts_manager':
+        return {
+          core: modules.core,
+          financial: { ...modules.financial, items: modules.financial.items.filter(item => ['expenses', 'statements'].includes(item.id)) }
+        }
+      case 'project_manager':
+        return {
+          core: modules.core,
+          projects: modules.projects,
+          financial: { ...modules.financial, items: modules.financial.items.filter(item => item.id === 'expenses') },
+          operations: modules.operations
+        }
+      default:
+        return {
+          core: modules.core,
+          projects: modules.projects
+        }
+    }
+  }
+
+  // Get all items for finding active tab label
+  const getAllItems = () => {
+    const modules = getNavigationModules()
+    return Object.values(modules).flatMap(module => module.items)
+  }
 
   const quickStats = [
     {
@@ -103,11 +206,11 @@ export function MobileDashboard({ activeTab, onTabChange, children }: MobileDash
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Mobile Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center space-x-3">
+      <header className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between sticky top-0 z-50 h-14">
+        <div className="flex items-center space-x-2">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="p-2">
+              <Button variant="ghost" size="sm" className="h-10 w-10 p-0 active:scale-95 transition-transform">
                 <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
@@ -131,71 +234,106 @@ export function MobileDashboard({ activeTab, onTabChange, children }: MobileDash
                 </SheetHeader>
                 
                 <ScrollArea className="flex-1">
-                  <div className="p-4 space-y-2">
-                    {menuItems.map((item) => (
-                      <Button
-                        key={item.id}
-                        variant={activeTab === item.id ? "default" : "ghost"}
-                        className="w-full justify-start h-12"
-                        onClick={() => {
-                          onTabChange(item.id)
-                        }}
-                      >
-                        <item.icon className={`w-5 h-5 mr-3 ${activeTab === item.id ? 'text-white' : item.color}`} />
-                        <span className="flex-1 text-left">{item.label}</span>
-                        {item.badge && (
-                          <Badge variant="secondary" className="ml-2">
-                            {item.badge}
-                          </Badge>
-                        )}
-                      </Button>
+                  <div className="p-4 space-y-4">
+                    {Object.entries(getNavigationModules()).map(([moduleKey, module]) => (
+                      <div key={moduleKey} className="space-y-2">
+                        <div className="px-2 py-1">
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                            {module.title}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          {module.items.map((item) => (
+                            <Button
+                              key={item.id}
+                              variant={activeTab === item.id ? "default" : "ghost"}
+                              className="w-full justify-start h-11"
+                              onClick={() => {
+                                onTabChange(item.id)
+                              }}
+                            >
+                              <item.icon className={`w-4 h-4 mr-3 ${activeTab === item.id ? 'text-white' : item.color}`} />
+                              <span className="flex-1 text-left text-sm">{item.label}</span>
+                              {item.badge && (
+                                <Badge variant="secondary" className="ml-2 text-xs">
+                                  {item.badge}
+                                </Badge>
+                              )}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
                     ))}
-                  </div>
-                  
-                  <div className="p-4 border-t">
-                    <Button variant="ghost" className="w-full justify-start h-12" onClick={() => onTabChange('settings')}>
-                      <Settings className="w-5 h-5 mr-3 text-gray-500" />
-                      Settings
-                    </Button>
                   </div>
                 </ScrollArea>
               </div>
             </SheetContent>
           </Sheet>
           
-          <div>
-            <h1 className="font-semibold text-lg capitalize">
-              {menuItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
+          <div className="flex items-center space-x-1">
+            <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
+              <Building2 className="w-3 h-3 text-white" />
+            </div>
+            <h1 className="font-semibold text-base capitalize truncate">
+              {getAllItems().find(item => item.id === activeTab)?.label || 'Dashboard'}
             </h1>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="sm" className="p-2" onClick={() => setSearchOpen(!searchOpen)}>
+        <div className="flex items-center space-x-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-10 w-10 p-0 active:scale-95 transition-transform" 
+            onClick={() => setSearchOpen(!searchOpen)}
+          >
             <Search className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="sm" className="p-2 relative">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-10 w-10 p-0 relative active:scale-95 transition-transform"
+          >
             <Bell className="w-5 h-5" />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
+              <span className="text-xs text-white">3</span>
+            </div>
           </Button>
         </div>
       </header>
 
-      {/* Search Bar (when expanded) */}
+      {/* Search Overlay */}
       {searchOpen && (
-        <div className="bg-white border-b border-gray-200 p-4">
-          <div className="flex items-center space-x-2">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search projects, expenses, users..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-lg border-0 focus:ring-2 focus:ring-primary focus:bg-white"
-              />
+        <div className="fixed inset-0 bg-white z-50 flex flex-col">
+          <div className="bg-white border-b border-gray-200 p-4">
+            <div className="flex items-center space-x-2">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search projects, expenses, users..."
+                  className="w-full h-12 pl-10 pr-4 bg-gray-100 rounded-lg border-0 focus:ring-2 focus:ring-primary focus:bg-white text-base"
+                  style={{ fontSize: '16px' }}
+                  autoFocus
+                />
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-12 px-3"
+                onClick={() => setSearchOpen(false)}
+              >
+                Cancel
+              </Button>
             </div>
-            <Button variant="ghost" size="sm">
-              <Filter className="w-4 h-4" />
-            </Button>
+          </div>
+          
+          {/* Search Results */}
+          <div className="flex-1 p-4">
+            <div className="text-center text-gray-500 mt-8">
+              <Search className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <p className="text-sm">Start typing to search...</p>
+            </div>
           </div>
         </div>
       )}

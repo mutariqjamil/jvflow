@@ -11,6 +11,7 @@ import {
   Calendar,
   User
 } from 'lucide-react'
+import { useInternationalization } from '../providers/InternationalizationProvider'
 
 // Mock commission data
 const mockCommissions = [
@@ -89,14 +90,7 @@ const agentSummary = [
 ]
 
 export function CommissionsDashboard() {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
+  const { t, formatCurrency } = useInternationalization()
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -133,9 +127,9 @@ export function CommissionsDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Commission Management</h2>
+        <h2 className="text-2xl font-bold tracking-tight">{t('commissions.title')}</h2>
         <p className="text-muted-foreground">
-          Track agent performance and commission payouts
+          {t('commissions.description')}
         </p>
       </div>
 
@@ -143,52 +137,52 @@ export function CommissionsDashboard() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Paid</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('commissions.totalPaid')}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(totalCommissionsPaid)}</div>
             <p className="text-xs text-green-600">
-              {mockCommissions.filter(c => c.status === 'paid').length} payments
+              {mockCommissions.filter(c => c.status === 'paid').length} {t('commissions.payments')}
             </p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('commissions.pending')}</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(totalCommissionsPending)}</div>
             <p className="text-xs text-orange-600">
-              {mockCommissions.filter(c => c.status === 'pending').length} awaiting payment
+              {mockCommissions.filter(c => c.status === 'pending').length} {t('commissions.awaitingPayment')}
             </p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Month</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('commissions.thisMonth')}</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(thisMonthCommissions)}</div>
             <p className="text-xs text-green-600">
-              +22% from last month
+              {t('commissions.monthlyGrowthPercent')}
             </p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('commissions.averageRate')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">5.0%</div>
             <p className="text-xs text-muted-foreground">
-              Standard commission rate
+              {t('commissions.standardRate')}
             </p>
           </CardContent>
         </Card>
@@ -197,9 +191,9 @@ export function CommissionsDashboard() {
       {/* Agent Performance */}
       <Card>
         <CardHeader>
-          <CardTitle>Agent Performance</CardTitle>
+          <CardTitle>{t('commissions.agentPerformance')}</CardTitle>
           <CardDescription>
-            Commission earnings by sales agent
+            {t('commissions.agentPerformanceDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -213,25 +207,25 @@ export function CommissionsDashboard() {
                   </div>
                   <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                      <div className="text-muted-foreground">Units Sold</div>
+                      <div className="text-muted-foreground">{t('commissions.unitsSold')}</div>
                       <div className="font-medium">{agent.units_sold}</div>
                     </div>
                     <div>
-                      <div className="text-muted-foreground">Total Commission</div>
+                      <div className="text-muted-foreground">{t('commissions.totalCommission')}</div>
                       <div className="font-medium">{formatCurrency(agent.total_commission)}</div>
                     </div>
                     <div>
-                      <div className="text-muted-foreground">Pending</div>
+                      <div className="text-muted-foreground">{t('commissions.pending')}</div>
                       <div className="font-medium text-orange-600">{formatCurrency(agent.pending_commission)}</div>
                     </div>
                     <div>
-                      <div className="text-muted-foreground">This Month</div>
+                      <div className="text-muted-foreground">{t('commissions.thisMonth')}</div>
                       <div className="font-medium text-green-600">{formatCurrency(agent.this_month)}</div>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-muted-foreground">Performance</div>
+                  <div className="text-sm text-muted-foreground">{t('commissions.performance')}</div>
                   <Progress value={(agent.units_sold / 5) * 100} className="w-20 mt-1" />
                 </div>
               </div>
@@ -243,22 +237,22 @@ export function CommissionsDashboard() {
       {/* Commission Records */}
       <Card>
         <CardHeader>
-          <CardTitle>Commission Records</CardTitle>
-          <CardDescription>Detailed commission tracking and payment history</CardDescription>
+          <CardTitle>{t('commissions.commissionRecords')}</CardTitle>
+          <CardDescription>{t('commissions.commissionRecordsDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Agent</TableHead>
-                <TableHead>Sale Date</TableHead>
-                <TableHead>Unit</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Sale Amount</TableHead>
-                <TableHead>Commission</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Paid Date</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t('commissions.agent')}</TableHead>
+                <TableHead>{t('commissions.saleDate')}</TableHead>
+                <TableHead>{t('bookings.unit')}</TableHead>
+                <TableHead>{t('commissions.customer')}</TableHead>
+                <TableHead>{t('commissions.saleAmount')}</TableHead>
+                <TableHead>{t('commissions.commission')}</TableHead>
+                <TableHead>{t('bookings.status')}</TableHead>
+                <TableHead>{t('commissions.paidDate')}</TableHead>
+                <TableHead>{t('bookings.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -291,7 +285,7 @@ export function CommissionsDashboard() {
                     <Badge className={getStatusColor(commission.status)}>
                       <span className="flex items-center gap-1">
                         {getStatusIcon(commission.status)}
-                        {commission.status}
+                        {t(`bookings.${commission.status}`)}
                       </span>
                     </Badge>
                   </TableCell>
@@ -307,7 +301,7 @@ export function CommissionsDashboard() {
                   <TableCell>
                     {commission.status === 'pending' && (
                       <Button size="sm" variant="outline">
-                        Process Payment
+                        {t('commissions.processPayment')}
                       </Button>
                     )}
                   </TableCell>

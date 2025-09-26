@@ -44,14 +44,26 @@ export function MobileOptimizedCard({
 }: MobileOptimizedCardProps) {
   const isClickable = !!onTap
 
+  const handleTap = (e: React.MouseEvent) => {
+    if (onTap) {
+      // Add haptic feedback simulation
+      if ('vibrate' in navigator) {
+        navigator.vibrate(10)
+      }
+      onTap()
+    }
+  }
+
   return (
     <Card 
       className={cn(
-        "border-0 shadow-sm hover:shadow-md transition-shadow",
-        isClickable && "cursor-pointer active:scale-[0.98] transition-transform",
+        "border-0 shadow-sm transition-all duration-200",
+        "hover:shadow-md focus:shadow-lg",
+        isClickable && "cursor-pointer active:scale-[0.98] active:shadow-sm active:bg-gray-50",
+        isClickable && "select-none", // Prevent text selection
         className
       )}
-      onClick={onTap}
+      onClick={handleTap}
     >
       <CardContent className={cn("p-4", compact && "p-3")}>
         <div className="flex items-center justify-between">

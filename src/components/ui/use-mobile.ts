@@ -1,76 +1,28 @@
 import * as React from "react";
-
-type Breakpoint = 'mobile' | 'tablet' | 'desktop';
+import { useBreakpoint } from "./use-breakpoint";
 
 const MOBILE_BREAKPOINT = 768;
-const TABLET_BREAKPOINT = 1024;
 
-export function useBreakpoint(): Breakpoint {
-  const [breakpoint, setBreakpoint] = React.useState<Breakpoint>('desktop');
-
-  React.useEffect(() => {
-    const updateBreakpoint = () => {
-      const width = window.innerWidth;
-      if (width < MOBILE_BREAKPOINT) {
-        setBreakpoint('mobile');
-      } else if (width < TABLET_BREAKPOINT) {
-        setBreakpoint('tablet');
-      } else {
-        setBreakpoint('desktop');
-      }
-    };
-
-    // Set initial breakpoint
-    updateBreakpoint();
-
-    // Create media query listeners for each breakpoint
-    const mobileQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-    const tabletQuery = window.matchMedia(`(min-width: ${MOBILE_BREAKPOINT}px) and (max-width: ${TABLET_BREAKPOINT - 1}px)`);
-    
-    const handleChange = () => updateBreakpoint();
-    
-    mobileQuery.addEventListener('change', handleChange);
-    tabletQuery.addEventListener('change', handleChange);
-
-    return () => {
-      mobileQuery.removeEventListener('change', handleChange);
-      tabletQuery.removeEventListener('change', handleChange);
-    };
-  }, []);
-
-  return breakpoint;
-}
-
-// Enhanced hooks for specific use cases
-export function useIsMobile(): boolean {
+export function useIsMobile() {
   const breakpoint = useBreakpoint();
   return breakpoint === 'mobile';
 }
 
-export function useIsTablet(): boolean {
-  const breakpoint = useBreakpoint();
-  return breakpoint === 'tablet';
-}
+// Legacy hook for backward compatibility
+export function useIsMobileLegacy() {
+  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(
+    undefined,
+  );
 
-export function useIsDesktop(): boolean {
-  const breakpoint = useBreakpoint();
-  return breakpoint === 'desktop';
-}
+  React.useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+    const onChange = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+    mql.addEventListener("change", onChange);
+    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
 
-// Utility hook for responsive behavior
-export function useResponsiveValue<T>(
-  mobile: T,
-  tablet: T,
-  desktop: T
-): T {
-  const breakpoint = useBreakpoint();
-  
-  switch (breakpoint) {
-    case 'mobile':
-      return mobile;
-    case 'tablet':
-      return tablet;
-    default:
-      return desktop;
-  }
+  return !!isMobile;
 }

@@ -200,8 +200,8 @@ function AuthForm({ activeTab, onTabChange }: { activeTab: string; onTabChange: 
   }
 
   const handleDemoLogin = () => {
-    setSignInEmail('demo@jvflow.com')
-    setSignInPassword('demo123')
+    setSignInEmail('tj.analyst@gmail.com')
+    setSignInPassword('Asdf123@')
   }
 
   return (

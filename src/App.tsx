@@ -8,7 +8,7 @@ import { OrganizationSetup } from './components/OrganizationSetup'
 import { ResponsiveWrapper } from './components/ResponsiveWrapper'
 import { LoadingSpinner } from './components/ui/LoadingSpinner'
 import { ContentRenderer } from './components/utils/ContentRenderer'
-import { useIsMobile } from './components/ui/use-mobile'
+import { useBreakpoint } from './components/ui/use-breakpoint'
 import { Toaster } from './components/ui/sonner'
 import { DEFAULT_TAB } from './components/constants/dashboardRoutes'
 
@@ -17,7 +17,8 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState(DEFAULT_TAB)
   const [showOrgSetup, setShowOrgSetup] = useState(false)
   const [currentForm, setCurrentForm] = useState<string | null>(null)
-  const isMobile = useIsMobile()
+  const breakpoint = useBreakpoint()
+  const isMobile = breakpoint === 'mobile'
 
   if (loading) {
     return <LoadingSpinner />
