@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { supabase, User, isSupabaseConfigured } from '../lib/supabase'
 import { projectId, publicAnonKey } from '../utils/supabase/info'
+import { logger, authLog } from '../utils/logger'
 
 interface Organization {
   id: string
@@ -31,7 +32,8 @@ interface AuthContextType {
   currentOrganization: Organization | null
   trialDaysRemaining: number
   signIn: (email: string, password: string) => Promise<void>
-  signInWithProvider: (provider: 'google' | 'facebook' | 'linkedin') => Promise<void>
+  signInWithProvider: (provider: 'google' | 'facebook' | 'linkedin' | 'reset_password') => Promise<void>
+  resetPassword: (email: string) => Promise<void>
   signUp: (data: { email?: string, phone?: string, password: string, name: string, registrationType: 'email' | 'phone' }) => Promise<void>
   signOut: () => Promise<void>
   createOrganization: (data: { name: string, description?: string, industry?: string }) => Promise<Organization>
@@ -56,10 +58,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentOrganization, setCurrentOrganization] = useState<Organization | null>(null)
   const [trialDaysRemaining, setTrialDaysRemaining] = useState(0)
   const [loading, setLoading] = useState(true)
-  const isDemoMode = false // Always show as connected now
+  const isDemoMode = !isSupabaseConfigured // Use demo mode only if Supabase is not configured
+  
+  // Log initialization
+  authLog('info', 'AuthProvider initialized', { 
+    isDemoMode, 
+    isSupabaseConfigured, 
+    projectId: isDemoMode ? 'demo-mode' : projectId?.substring(0, 8) + '...' 
+  })
 
   const apiCall = async (endpoint: string, options: RequestInit = {}) => {
-    const token = isDemoMode ? 'demo-token' : (await supabase?.auth.getSession())?.data?.session?.access_token || publicAnonKey
+    if (isDemoMode) {
+      // In demo mode, don't make real API calls
+      throw new Error('API calls not available in demo mode')
+    }
+    
+    const token = (await supabase?.auth.getSession())?.data?.session?.access_token || publicAnonKey
     
     const response = await fetch(
       `https://${projectId}.supabase.co/functions/v1/make-server-df4644bf${endpoint}`,
@@ -101,35 +115,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    // Always create a default user with the specified credentials (Supabase connected by default)
+    // Always create a default super admin user
     const defaultUser: UserProfile = {
-      id: 'default-user',
+      id: 'super-admin-001',
       email: 'tj.analyst@gmail.com',
       role: 'super_admin',
-      name: 'muhammadtj',
+      name: 'Muhammad TJ (Super Admin)',
       registration_type: 'email',
       subscription_status: 'active',
       trial_start_date: new Date().toISOString(),
-      trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
-      organizations: ['default-org']
+      trial_end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
+      organizations: ['default-org', 'platform-admin']
+    }
+    
+    const platformAdminOrg: Organization = {
+      id: 'platform-admin',
+      name: 'JV-Flow Platform Administration',
+      description: 'Super admin organization for platform management',
+      industry: 'Platform Management',
+      owner_id: 'super-admin-001',
+      subscription_status: 'active',
+      trial_end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+      user_role: 'super_admin',
+      user_permissions: ['*', 'platform.*', 'super_admin.*']
     }
     
     const defaultOrg: Organization = {
       id: 'default-org',
-      name: 'JV-Flow Real Estate Management',
-      description: 'Complete real estate joint venture management system',
+      name: 'Demo Real Estate Company',
+      description: 'Demo organization for testing JV-Flow features',
       industry: 'Real Estate',
-      owner_id: 'default-user',
+      owner_id: 'super-admin-001',
       subscription_status: 'active',
       trial_end_date: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
-      user_role: 'owner',
+      user_role: 'admin',
       user_permissions: ['*']
     }
     
     setUser(defaultUser)
-    setOrganizations([defaultOrg])
-    setCurrentOrganization(defaultOrg)
-    setTrialDaysRemaining(31)
+    setOrganizations([platformAdminOrg, defaultOrg])
+    setCurrentOrganization(platformAdminOrg) // Start with platform admin
+    setTrialDaysRemaining(365)
     setLoading(false)
     
     if (isDemoMode) {
@@ -168,23 +194,77 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [isDemoMode])
 
   const signIn = async (email: string, password: string) => {
-    if (isDemoMode) {
-      // Demo mode handled in useEffect
-      return
-    }
+    logger.startTimer('signin-process')
+    authLog('info', 'Sign in attempt started', { email: email.substring(0, 3) + '***' })
+    
+    try {
+      if (isDemoMode) {
+        authLog('info', 'Demo mode authentication', { email })
+        
+        // Enhanced demo credentials with multiple test users
+        const demoUsers = {
+          'tj.analyst@gmail.com': 'Asdf123@',
+          'demo@jvflow.com': 'demo123',
+          'admin@jvflow.com': 'admin123',
+          'test@jvflow.com': 'test123'
+        }
+        
+        if (demoUsers[email as keyof typeof demoUsers] === password) {
+          authLog('info', 'Demo authentication successful', { email })
+          
+          // Store auth state for logging
+          const authState = { user: { id: user?.id, email }, timestamp: Date.now() }
+          localStorage.setItem('auth_state', JSON.stringify(authState))
+          
+          logger.endTimer('signin-process')
+          return
+        } else {
+          const validEmails = Object.keys(demoUsers).join(', ')
+          authLog('error', 'Invalid demo credentials provided', { email, validEmails })
+          throw new Error(`Invalid demo credentials. Valid emails: ${validEmails}`)
+        }
+      }
 
-    if (!supabase) {
-      throw new Error('Supabase not configured')
-    }
+      if (!supabase) {
+        authLog('error', 'Supabase client not initialized')
+        throw new Error('Authentication service not available')
+      }
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    })
-    if (error) throw error
+      authLog('debug', 'Calling Supabase signInWithPassword')
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+      
+      if (error) {
+        authLog('error', 'Supabase authentication failed', { 
+          error: error.message, 
+          email: email.substring(0, 3) + '***' 
+        })
+        throw new Error(error.message || 'Authentication failed')
+      }
+      
+      authLog('info', 'Supabase authentication successful', { 
+        userId: data.user?.id,
+        email: email.substring(0, 3) + '***'
+      })
+      
+      logger.endTimer('signin-process')
+    } catch (error) {
+      logger.endTimer('signin-process')
+      authLog('error', 'Sign in process failed', { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        email: email.substring(0, 3) + '***'
+      })
+      throw error
+    }
   }
 
-  const signInWithProvider = async (provider: 'google' | 'facebook' | 'linkedin') => {
+  const signInWithProvider = async (provider: 'google' | 'facebook' | 'linkedin' | 'reset_password') => {
+    if (provider === 'reset_password') {
+      throw new Error('Use resetPassword function for password reset')
+    }
+
     if (isDemoMode) {
       throw new Error('Social login not available in demo mode')
     }
@@ -196,8 +276,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: provider as any,
       options: {
-        redirectTo: window.location.origin
+        redirectTo: window.location.origin + '/dashboard'
       }
+    })
+    if (error) {
+      // Provide more specific error messages
+      if (error.message.includes('not enabled')) {
+        throw new Error(`${provider} login is not enabled. Please contact administrator.`)
+      }
+      throw new Error(`${provider} login failed: ${error.message}`)
+    }
+  }
+
+  const resetPassword = async (email: string) => {
+    if (isDemoMode) {
+      throw new Error('Password reset not available in demo mode')
+    }
+
+    if (!supabase) {
+      throw new Error('Supabase not configured')
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/reset-password'
     })
     if (error) throw error
   }
@@ -305,6 +406,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     createOrganization,
     switchOrganization,
     refreshProfile,
+    resetPassword,
     isDemoMode
   }
 

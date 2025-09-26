@@ -23,6 +23,7 @@ import { ProfileSettings } from '../ProfileSettings'
 import { SuperAdminArea } from '../SuperAdminArea'
 import { UserRoleManagement } from '../UserRoleManagement'
 import { AuditTrail } from '../AuditTrail'
+import { AuthTestPanel } from '../AuthTestPanel'
 
 export const DASHBOARD_COMPONENTS = {
   overview: OverviewDashboard,
@@ -52,6 +53,7 @@ export const DASHBOARD_COMPONENTS = {
   'super-admin': SuperAdminArea,
   'user-roles': UserRoleManagement,
   'audit-trail': AuditTrail,
+  'auth-test': AuthTestPanel,
 } as const
 
 export const DEFAULT_TAB = 'overview'

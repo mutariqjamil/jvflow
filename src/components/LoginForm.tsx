@@ -98,10 +98,11 @@ function DesktopBrandingSection() {
 }
 
 function AuthForm({ activeTab, onTabChange }: { activeTab: string; onTabChange: (tab: string) => void }) {
-  const { signIn, signInWithProvider, signUp, isDemoMode } = useAuth()
+  const { signIn, signInWithProvider, signUp, resetPassword, isDemoMode } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [resetEmailSent, setResetEmailSent] = useState(false)
 
   // Sign In Form State
   const [signInEmail, setSignInEmail] = useState('')
@@ -202,6 +203,27 @@ function AuthForm({ activeTab, onTabChange }: { activeTab: string; onTabChange: 
   const handleDemoLogin = () => {
     setSignInEmail('tj.analyst@gmail.com')
     setSignInPassword('Asdf123@')
+  }
+
+  const handleForgotPassword = async () => {
+    if (!signInEmail) {
+      setError('Please enter your email address first')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      await resetPassword(signInEmail)
+      setResetEmailSent(true)
+      setSuccess('Password reset email sent! Check your inbox and follow the instructions.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send reset email')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -470,13 +492,17 @@ function AuthForm({ activeTab, onTabChange }: { activeTab: string; onTabChange: 
           </div>
         )}
 
-        {!isDemoMode && activeTab === 'signin' && (
+        {activeTab === 'signin' && (
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Forgot your password?{' '}
-              <a href="#" className="text-blue-600 hover:underline">
+              <button 
+                type="button" 
+                onClick={handleForgotPassword}
+                className="text-blue-600 hover:underline focus:outline-none"
+              >
                 Reset it here
-              </a>
+              </button>
             </p>
           </div>
         )}

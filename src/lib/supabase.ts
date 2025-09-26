@@ -8,16 +8,33 @@ const supabaseKey = publicAnonKey
 // Create a mock supabase client for demo mode
 const mockSupabase = {
   auth: {
-    getSession: () => Promise.resolve({ data: { session: null } }),
+    getSession: () => Promise.resolve({ data: { session: null }, error: null }),
     onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-    signInWithPassword: () => Promise.resolve({ error: null }),
+    signInWithPassword: () => Promise.resolve({ 
+      data: { user: null, session: null }, 
+      error: null 
+    }),
+    signInWithOAuth: () => Promise.resolve({ 
+      data: { user: null, session: null }, 
+      error: new Error('Social login not available in demo mode') 
+    }),
+    resetPasswordForEmail: () => Promise.resolve({ 
+      data: {}, 
+      error: new Error('Password reset not available in demo mode') 
+    }),
     signOut: () => Promise.resolve({ error: null })
   }
 }
 
-// Connect to Supabase by default with provided credentials
-export const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : mockSupabase
-export const isSupabaseConfigured = !!(supabaseUrl && supabaseKey)
+// Check if we have real Supabase configuration (not demo placeholders)
+const hasRealSupabaseConfig = supabaseUrl && 
+  supabaseKey && 
+  projectId !== 'demo-project-id' && 
+  publicAnonKey !== 'demo-anon-key'
+
+// Connect to Supabase only with real credentials, otherwise use mock
+export const supabase = hasRealSupabaseConfig ? createClient(supabaseUrl, supabaseKey) : mockSupabase
+export const isSupabaseConfigured = hasRealSupabaseConfig
 
 export type UserRole = 'investor' | 'builder' | 'marketing' | 'admin'
 

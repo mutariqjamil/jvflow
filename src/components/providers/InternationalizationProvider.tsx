@@ -37,6 +37,9 @@ export const languages: Record<Language, LanguageInfo> = {
 interface InternationalizationContextType {
   language: Language
   currency: Currency
+  currentLanguage: Language
+  currentCurrency: CurrencyInfo
+  currencies: CurrencyInfo[]
   direction: 'ltr' | 'rtl'
   setLanguage: (language: Language) => void
   setCurrency: (currency: Currency) => void
@@ -416,7 +419,6 @@ const translations: Record<Language, Record<string, string>> = {
     'procurement.requestsProcessed': 'requests processed',
     'procurement.procurementRequests': 'Procurement Requests',
     'procurement.requestId': 'Request ID',
-    'procurement.description': 'Description',
     'procurement.requestedBy': 'Requested By',
     'procurement.amount': 'Amount',
     'procurement.status': 'Status',
@@ -544,7 +546,6 @@ const translations: Record<Language, Record<string, string>> = {
     'accountStatements.pendingTransactions': 'Pending Transactions',
     'accountStatements.transactionHistory': 'Transaction History',
     'accountStatements.date': 'Date',
-    'accountStatements.description': 'Description',
     'accountStatements.type': 'Type',
     'accountStatements.amount': 'Amount',
     'accountStatements.balance': 'Balance',
@@ -586,7 +587,52 @@ const translations: Record<Language, Record<string, string>> = {
     'installments.status': 'Status',
     'installments.actions': 'Actions',
     'installments.generateInvoice': 'Generate Invoice',
-    'installments.recordPayment': 'Record Payment'
+    'installments.recordPayment': 'Record Payment',
+
+    // Profile Settings
+    'profile.settings': 'Profile Settings',
+    'profile.manage_preferences': 'Manage your account settings and preferences',
+    'profile.profile': 'Profile',
+    'profile.notifications': 'Notifications',
+    'profile.privacy': 'Privacy',
+    'profile.security': 'Security',
+    'profile.preferences': 'Preferences',
+    'profile.personal_information': 'Personal Information',
+    'profile.personal_info_description': 'Update your personal details and contact information',
+    'profile.change_photo': 'Change Photo',
+    'profile.photo_requirements': 'JPG or PNG, max 2MB',
+    'profile.first_name': 'First Name',
+    'profile.last_name': 'Last Name',
+    'profile.email': 'Email',
+    'profile.phone': 'Phone',
+    'profile.address': 'Address',
+    'profile.bio': 'Bio',
+    'profile.department': 'Department',
+    'profile.job_title': 'Job Title',
+    'profile.current_password': 'Current Password',
+    'profile.new_password': 'New Password',
+    'profile.confirm_password': 'Confirm Password',
+    'profile.enter_current_password': 'Enter your current password',
+    'profile.enter_new_password': 'Enter a new password',
+    'profile.confirm_new_password': 'Confirm your new password',
+    'profile.update_password': 'Update Password',
+    'profile.two_factor_auth': 'Two-Factor Authentication',
+    'profile.two_factor_description': 'Add an extra layer of security to your account',
+    'profile.session_timeout': 'Session Timeout',
+    'profile.minutes': 'minutes',
+    'profile.hour': 'hour',
+    'profile.hours': 'hours',
+    'profile.multiple_sessions': 'Allow Multiple Sessions',
+    'profile.multiple_sessions_description': 'Allow login from multiple devices simultaneously',
+    'profile.language_region': 'Language & Region',
+    'profile.language_region_description': 'Customize your language and regional preferences',
+    'profile.language': 'Language',
+    'profile.currency': 'Currency',
+    'profile.timezone': 'Timezone',
+    'profile.date_format': 'Date Format',
+    'profile.time_format': 'Time Format',
+    'profile.saved_successfully': 'Profile saved successfully!',
+    'profile.save_error': 'Failed to save profile. Please try again.'
   },
   
   ar: {
@@ -956,7 +1002,6 @@ const translations: Record<Language, Record<string, string>> = {
     'procurement.requestsProcessed': 'طلبات معالجة',
     'procurement.procurementRequests': 'طلبات الشراء',
     'procurement.requestId': 'معرف الطلب',
-    'procurement.description': 'الوصف',
     'procurement.requestedBy': 'طلب من قبل',
     'procurement.amount': 'المبلغ',
     'procurement.status': 'الحالة',
@@ -1084,7 +1129,6 @@ const translations: Record<Language, Record<string, string>> = {
     'accountStatements.pendingTransactions': 'المعاملات المعلقة',
     'accountStatements.transactionHistory': 'تاريخ المعاملات',
     'accountStatements.date': 'التاريخ',
-    'accountStatements.description': 'الوصف',
     'accountStatements.type': 'النوع',
     'accountStatements.amount': 'المبلغ',
     'accountStatements.balance': 'الرصيد',
@@ -1496,7 +1540,6 @@ const translations: Record<Language, Record<string, string>> = {
     'procurement.requestsProcessed': 'درخواستیں پروسیس شدہ',
     'procurement.procurementRequests': 'خریداری کی درخواستیں',
     'procurement.requestId': 'درخواست کی شناخت',
-    'procurement.description': 'تفصیل',
     'procurement.requestedBy': 'درخواست کنندہ',
     'procurement.amount': 'رقم',
     'procurement.status': 'حالت',
@@ -1624,7 +1667,6 @@ const translations: Record<Language, Record<string, string>> = {
     'accountStatements.pendingTransactions': 'زیر التواء ٹرانزیکشنز',
     'accountStatements.transactionHistory': 'ٹرانزیکشن کی تاریخ',
     'accountStatements.date': 'تاریخ',
-    'accountStatements.description': 'تفصیل',
     'accountStatements.type': 'قسم',
     'accountStatements.amount': 'رقم',
     'accountStatements.balance': 'بیلنس',
@@ -1676,7 +1718,7 @@ interface InternationalizationProviderProps {
 
 export function InternationalizationProvider({ children }: InternationalizationProviderProps) {
   const [language, setLanguageState] = useState<Language>('en')
-  const [currency, setCurrencyState] = useState<Currency>('USD')
+  const [currency, setCurrencyState] = useState<Currency>('PKR')
 
   // Load saved settings from localStorage
   useEffect(() => {
@@ -1688,6 +1730,10 @@ export function InternationalizationProvider({ children }: InternationalizationP
     }
     if (savedCurrency && currencies[savedCurrency]) {
       setCurrencyState(savedCurrency)
+    } else {
+      // Set PKR as default for Pakistan
+      setCurrencyState('PKR')
+      localStorage.setItem('jv-flow-currency', 'PKR')
     }
   }, [])
 
@@ -1749,12 +1795,17 @@ export function InternationalizationProvider({ children }: InternationalizationP
   }
 
   const direction = languages[language].direction
+  const currentCurrency = currencies[currency]
+  const currenciesArray = Object.values(currencies)
 
   return (
     <InternationalizationContext.Provider
       value={{
         language,
         currency,
+        currentLanguage: language,
+        currentCurrency,
+        currencies: currenciesArray,
         direction,
         setLanguage,
         setCurrency,

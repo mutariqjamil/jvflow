@@ -518,9 +518,8 @@ export function ProfileSettings({ onClose }: ProfileSettingsProps) {
                   
                   <div className="space-y-2">
                     <Label>{t('profile.currency')}</Label>
-                    <Select value={currentCurrency.code} onValueChange={(code) => {
-                      const currency = currencies.find(c => c.code === code)
-                      if (currency) setCurrency(currency)
+                    <Select value={currentCurrency?.code || 'USD'} onValueChange={(code) => {
+                      setCurrency(code as Currency)
                     }}>
                       <SelectTrigger>
                         <SelectValue />
